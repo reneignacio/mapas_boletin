@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import arcpy
 import os
+
 regiones = {
     "R01": "Región de Tarapacá",
     "R02": "Región de Antofagasta",
@@ -19,13 +20,17 @@ regiones = {
     "R15": "Región de Arica y Parinacota",
     "R16": "Región del Ñuble"
 }
-savi=0
-mxd = arcpy.mapping.MapDocument("C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\ANOMALIA_SAVI.mxd")
+
+mxd = arcpy.mapping.MapDocument("C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\\ANOMALIA_SAVI2.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 layers = arcpy.mapping.ListLayers(mxd)
-layers
 
-#Cargar capa SAVI.tif
+for layer in layers:
+    if layer.isRasterLayer:
+        arcpy.mapping.RemoveLayer(df, layer)
+        print("{} removida".format(layer.name))
+
+# Cargar capa SAVI.tif
 for region in regiones.keys():
     R = region
     ruta_anomalia_SAVI_tif = "C:\\Users\\INIA\\Desktop\\2023-06-26_v2\\{0}\\TIF\\ANOMALIA\\{0}_Anomalia_SAVI_median_ZA.tif".format(R)
@@ -34,63 +39,19 @@ for region in regiones.keys():
             capa_anomalia = arcpy.mapping.Layer(ruta_anomalia_SAVI_tif)
             arcpy.mapping.AddLayer(df, capa_anomalia, "BOTTOM")
             print("tif {} añadido".format(R))
-            savi += 1
         except Exception as e:
             print("Error cargando capa para la region {}: {}".format(R, e))
 
-if savi == 3:
-    print("se detectaron {} capas de SAVI, esta correcto".format(savi))
-else:
-    print("el numero de capas SAVI es {} y deberian ser 3".format(savi))
-
-
-mxd.save()
 arcpy.RefreshActiveView()
 arcpy.RefreshTOC()
-
-
-#MEJOR CAMBIARLO POR ALGO ASI, QUE REVISA LAS CAPAS DENTRO DEL MXD
-
+mxd.save()
 # Extraer solo los nombres y ordenar la lista alfabéticamente
-layer_names = sorted([layer.name for layer in layers])
-layer_names
-# Filtrar y contar los nombres de las capas que contienen "Anomalia_SAVI"
+layer_names = sorted([layer.name for layer in arcpy.mapping.ListLayers(mxd)])
 
-anomalia_savi_count = len([name for name in layer_names if "Anomalia_SAVI" in name])
+# Filtrar y almacenar los nombres de las capas que contienen "Anomalia_SAVI"
+anomalia_savi_layers = [name for name in layer_names if "Anomalia_SAVI" in name]
+
+# Contar y mostrar los nombres de las capas
+anomalia_savi_count = len(anomalia_savi_layers)
 print(anomalia_savi_count)
-
-
-
-
-
-
-
-
-""" #Cargar shp comunas.tif
-for region in regiones.keys():
-    R=region
-    ruta_anomalia_SAVI_tif="C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\\shape\\comunas\\{}.shp".format(R)
-    if os.path.exists(ruta_anomalia_SAVI_tif):
-        capa_anomalia=arcpy.mapping.Layer(ruta_anomalia_SAVI_tif)
-        arcpy.mapping.AddLayer(df,capa_anomalia,"BOTTOM")
-        print("tif region {} añadido".format(R))
-        savi=savi+1        
-if savi==3:
-    print("se subieron {} capas de SAVI, esta correcto".format(savi))
-else: 
-    print("el numero de capas SAVI subidas es {} y deberian ser 3".format(savi))
- """
-
-
-
-
-
-
-
-
-
-"""
-R="R02"
-ruta_anomalia_SAVI_tif="C:\\Users\\INIA\\Desktop\\2023-06-26_v2\\{0}\\TIF\\ANOMALIA\\{0}_Anomalia_SAVI_median_ZA.tif".format(R)
-capa_anomalia=arcpy.mapping.Layer(ruta_anomalia_SAVI_tif)
-arcpy.mapping.AddLayer(df,capa_anomalia)"""
+print(anomalia_savi_layers)

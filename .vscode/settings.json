@@ -1,3 +1,11 @@
 {
-    "python.analysis.typeCheckingMode": "off"
+    "python.defaultInterpreterPath": "C:\\Python27\\ArcGIS10.8\\python.exe",
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.autoComplete.extraPaths": [
+        "C:\\Program Files (x86)\\ArcGIS\\Desktop10.8\\arcpy\\arcpy"
+    ],
+    "python.analysis.extraPaths": [
+        "C:\\Program Files (x86)\\ArcGIS\\Desktop10.8\\arcpy\\arcpy"
+    ]
 }
