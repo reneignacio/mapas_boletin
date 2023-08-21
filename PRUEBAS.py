@@ -26,6 +26,7 @@ mxd = arcpy.mapping.MapDocument("C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 layers = arcpy.mapping.ListLayers(mxd)[0]
 
+#modificion
 
 
 
