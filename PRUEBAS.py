@@ -26,11 +26,6 @@ mxd = arcpy.mapping.MapDocument("C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 layers = arcpy.mapping.ListLayers(mxd)[0]
 
-#modificion
-
-
-
-
 
 #Cargar capa SAVI.tif
 for region in regiones.keys():
@@ -46,7 +41,24 @@ if savi==3:
 else: 
     print("el numero de capas SAVI subidas es {} y deberian ser 3".format(savi))
 
-#Cargar shp comunas.tif
+
+
+#MEJOR CAMBIARLO POR ALGO ASI, QUE REVISA LAS CAPAS DENTRO DEL MXD
+
+# Extraer solo los nombres y ordenar la lista alfabéticamente
+layer_names = sorted([layer.name for layer in layers])
+# Filtrar y contar los nombres de las capas que contienen "Anomalia_SAVI"
+anomalia_savi_count = len([name for name in layer_names if "Anomalia_SAVI" in name])
+print(anomalia_savi_count)
+
+
+
+
+
+
+
+
+""" #Cargar shp comunas.tif
 for region in regiones.keys():
     R=region
     ruta_anomalia_SAVI_tif="C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\\shape\\comunas\\{}.shp".format(R)
@@ -59,15 +71,7 @@ if savi==3:
     print("se subieron {} capas de SAVI, esta correcto".format(savi))
 else: 
     print("el numero de capas SAVI subidas es {} y deberian ser 3".format(savi))
-
-#MEJOR CAMBIARLO POR ALGO ASI, QUE REVISA LAS CAPAS DENTRO DEL MXD
-
-# Extraer solo los nombres y ordenar la lista alfabéticamente
-layer_names = sorted([layer.name for layer in layers])
-# Filtrar y contar los nombres de las capas que contienen "Anomalia_SAVI"
-anomalia_savi_count = len([name for name in layer_names if "Anomalia_SAVI" in name])
-print(anomalia_savi_count)
-
+ """
 
 
 
