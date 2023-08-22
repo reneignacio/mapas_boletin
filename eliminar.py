@@ -58,7 +58,7 @@ print(anomalia_savi_count)
 print(anomalia_savi_layers)
 #SAVI AÑADIDO
 
-""" # Añadir la capa leyenda.tif al MXD
+ # Añadir la capa leyenda.tif al MXD
 ruta_leyenda_tif = "C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\\formato\\LEYENDA_v2.tif"
 try:
     leyenda_tif_layer = arcpy.mapping.Layer(ruta_leyenda_tif)
@@ -86,7 +86,9 @@ except Exception as e:
 
 # Guardar cambios
 mxd.save()
- """
+
+
+""" 
 # Añadir la capa leyenda.tif al MXD
 ruta_leyenda_tif = r"C:\Users\INIA\Desktop\MAPA_ANOMALIA_PYTHON\formato\LEYENDA_v2.tif"
 
@@ -139,17 +141,10 @@ mxd.save()
 
 
 
-
-
-
-
-""" 
 legend.autoAdd = True
 leyenda_lyr_path = "C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\\formato\\ANOMALIA\\LEYENDA_TIF.lyr"
 leyenda_layer_from_lyr = arcpy.mapping.Layer(leyenda_lyr_path)
 arcpy.mapping.AddLayer(df, leyenda_layer_from_lyr, "TOP")
-
-
 
 # Extraer solo los nombres y ordenar la lista alfabéticamente
 layer_names = sorted([layer.name for layer in arcpy.mapping.ListLayers(mxd)])

@@ -19,9 +19,12 @@ regiones = {
     "R15": "Región de Arica y Parinacota",
     "R16": "Región del Ñuble"
 }
-mxd = arcpy.mapping.MapDocument(r"C:\Users\INIA\Desktop\MAPA_ANOMALIA_PYTHON\ANOMALIA_SAVI2.mxd")
+
+os.chdir("D:/mapas_boletin/mapas_boletin")
+mxd = arcpy.mapping.MapDocument("ANOMALIA_SAVI3.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
-layers = arcpy.mapping.ListLayers(mxd)
+layers = arcpy.mapping.ListLayers(mxd, "", df)
+
 
 legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
 legend.autoAdd = False
@@ -34,49 +37,86 @@ for layer in layers:
 # Cargar capa SAVI.tif
 for region in regiones.keys():
     R = region
-    ruta_anomalia_SAVI_tif = "C:\\Users\\INIA\\Desktop\\2023-06-26_v2\\{0}\\TIF\\ANOMALIA\\{0}_Anomalia_SAVI_median_ZA.tif".format(R)
+    ruta_anomalia_SAVI_tif = "data\\{0}\\TIF\\ANOMALIA\\{0}_Anomalia_SAVI_median_ZA.tif".format(R)
     if os.path.exists(ruta_anomalia_SAVI_tif):
         try:
             capa_anomalia = arcpy.mapping.Layer(ruta_anomalia_SAVI_tif)
             arcpy.mapping.AddLayer(df, capa_anomalia, "BOTTOM")
+            capa_anomalia.visible=False
             print("tif {} añadido".format(R))
         except Exception as e:
             print("Error cargando capa para la region {}: {}".format(R, e))
 
+# Cargar regiones shp
+for region in regiones.keys():
+    R = region
+    ruta_comunas_shp = "shape\\comunas\\{}.shp".format(R)
+    if os.path.exists(ruta_comunas_shp):
+        try:
+            capa_lagos = arcpy.mapping.Layer(ruta_comunas_shp)
+            arcpy.mapping.AddLayer(df, capa_lagos, "BOTTOM")
+            capa_lagos.visible=False
+            print("{}.shp añadido".format(R))
+        except Exception as e:
+            print("Error cargando capa para la region {}: {}".format(R, e))
+
+#cargar lagos 
+for region in regiones.keys():
+    R = region
+    ruta_comunas_shp = "shape\\lagos\\Lagos_{}.shp".format(R)
+    if os.path.exists(ruta_comunas_shp):
+        try:
+            capa_lagos = arcpy.mapping.Layer(ruta_comunas_shp)
+            arcpy.mapping.AddLayer(df, capa_lagos, "BOTTOM")
+            capa_lagos.visible=False
+            print("Lagos_{}.shp añadido".format(R))
+        except Exception as e:
+            print("Error cargando capa para la region {}: {}".format(R, e))
+
+
+# Hacer todas las capas invisibles
+layers = arcpy.mapping.ListLayers(mxd, "", df)
+for layer in layers:
+    try:
+        layer.visible = False
+    except Exception as e:
+        print("Error con la capa: {}. Error: {}".format(layer.name,e))
+
 arcpy.RefreshActiveView()
 arcpy.RefreshTOC()
 mxd.save()
+
 # Extraer solo los nombres y ordenar la lista alfabéticamente
 layer_names = sorted([layer.name for layer in arcpy.mapping.ListLayers(mxd)])
 
 # Filtrar y almacenar los nombres de las capas que contienen "Anomalia_SAVI"
 anomalia_savi_layers = [name for name in layer_names if "Anomalia_SAVI" in name]
-
 # Contar y mostrar los nombres de las capas
 anomalia_savi_count = len(anomalia_savi_layers)
 print(anomalia_savi_count)
 print(anomalia_savi_layers)
 #SAVI AÑADIDO
 
+ # Añadir la capa leyenda.tif al MXD
+ruta_leyenda_tif = "formato\\LEYENDA_v2.tif"
+try:
+    leyenda_tif_layer = arcpy.mapping.Layer(ruta_leyenda_tif)
+    arcpy.mapping.AddLayer(df, leyenda_tif_layer)
+except Exception as e:
+    print("Error cargando la capa LEYENDA_v2.tif: {}".format(e))
+    # Detiene la ejecución si hay un error al cargar la capa
+    exit()
 
+arcpy.RefreshActiveView()
+arcpy.RefreshTOC()
 
 legend.autoAdd = True
 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
 leyenda_layer = arcpy.mapping.ListLayers(mxd, "LEYENDA_v2.tif")[0]
 leyenda_layer.visible = False
-ruta_estilo = "C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\\formato\\ANOMALIA\\LEYENDA_TIF.lyr"
+ruta_estilo = "formato\\ANOMALIA\\LEYENDA_TIF.lyr"
 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
 arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
-# Guardar cambios
-mxd.save()
-
-# Usar el método UpdateLayer para aplicar el estilo y asegurarse de que se aplique correctamente
-sourceLayer = arcpy.mapping.Layer(ruta_estilo)
-arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
-
-
-# Guardar cambios
-mxd.save()
 
 
 
@@ -87,6 +127,7 @@ def aplicar_simbologia(region):
     if target_layers:
         target_layer = target_layers[0]
         arcpy.ApplySymbologyFromLayer_management(target_layer, leyenda_layer)
+        print("simbologia aplicada")
     else:
         print("No se encontró la capa destino {}".format(capa_destino))
 
@@ -107,7 +148,7 @@ remover_capa_glaciares()
 def agregar_capa_leyenda(region):
     if region in ["R11", "R12"]:
         # Paso 1: Añadir la capa "Glaciares" al documento de mapa
-        ruta_glaciares = r"C:\Users\INIA\Desktop\MAPA_ANOMALIA_PYTHON\formato\glaciares y lagos\Glaciares.lyr"
+        ruta_glaciares = r"formato\glaciares y lagos\Glaciares.lyr"
         glaciares_layer = arcpy.mapping.Layer(ruta_glaciares)
         
         # Añadimos la capa "Glaciares" al fondo del marco de datos
@@ -125,7 +166,6 @@ def agregar_capa_leyenda(region):
         print("pase por aqui")
 
 
-
 def proceso(region):
     aplicar_simbologia(region)
     remover_capa_glaciares()
@@ -134,13 +174,14 @@ def proceso(region):
     if layer_principal_list:
         layer_principal = layer_principal_list[0]
         layer_principal.visible = True
+        layer_principal.visible = True
         arcpy.RefreshActiveView()
         
         df = arcpy.mapping.ListDataFrames(mxd)[0]
         df.extent = layer_principal.getExtent()
         arcpy.RefreshActiveView()
         
-        layer_principal.visible = False  # Desactivar la visibilidad después del zoom
+        #layer_principal.visible = False  # Desactivar la visibilidad después del zoom
         arcpy.RefreshActiveView()
     else:
         print("No se encontró la capa principal {}".format(region))
@@ -167,6 +208,7 @@ def proceso(region):
 
     agregar_capa_leyenda(region)
     agregar_capa_leyenda(region)
+
     # Actualiza el título
     titulo_nuevo = "Anomalia de SAVI del 26 de junio al 11 de julio de 2023, {}".format(regiones[region])
     for elem in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
@@ -175,7 +217,7 @@ def proceso(region):
             break
 
     # Guarda el PNG
-    carpeta_region = os.path.join(r"C:\Users\INIA\Desktop\MAPA_ANOMALIA_PYTHON\export", region)
+    carpeta_region = os.path.join("export", region)
 
     if not os.path.exists(carpeta_region):
         os.makedirs(carpeta_region)
@@ -188,7 +230,7 @@ def proceso(region):
     arcpy.RefreshActiveView()  # Refrescar la vista antes de guardar el PNG
     salida_png = os.path.join(carpeta_savi, "{}_ANOMALIA_SAVI.png".format(region))
     arcpy.mapping.ExportToPNG(mxd, salida_png, resolution=300, background_color="255, 255, 255")
-
+    print("png region {} guardado".format(region))
 
     # Ocultar todas las capas de la región actual después de guardar el PNG
     for capa in capas:
@@ -211,6 +253,7 @@ def proceso(region):
 #Ejecutar el proceso para cada región
 #for region in regiones.keys():
  #   proceso(region)
+proceso("R15")
 proceso("R01")
 proceso("R02")
 proceso("R15")
