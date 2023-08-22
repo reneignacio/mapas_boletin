@@ -55,3 +55,5 @@ anomalia_savi_layers = [name for name in layer_names if "Anomalia_SAVI" in name]
 anomalia_savi_count = len(anomalia_savi_layers)
 print(anomalia_savi_count)
 print(anomalia_savi_layers)
+
+# esto ahora hay que añadirlo a ANOMALIA_SAVI.py, falta agregar comunas y region y luego copiar el estilo de un archivo

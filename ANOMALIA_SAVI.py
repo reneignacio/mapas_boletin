@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import arcpy
 import os
-
-mxd = arcpy.mapping.MapDocument("C:\\Users\\INIA\\Desktop\\Agosto\\ANOMALIA_SAVI_AGOSTO_v2.mxd")
-
 regiones = {
     "R01": "Región de Tarapacá",
     "R02": "Región de Antofagasta",
@@ -22,21 +19,67 @@ regiones = {
     "R15": "Región de Arica y Parinacota",
     "R16": "Región del Ñuble"
 }
+mxd = arcpy.mapping.MapDocument(r"C:\Users\INIA\Desktop\MAPA_ANOMALIA_PYTHON\ANOMALIA_SAVI2.mxd")
+df = arcpy.mapping.ListDataFrames(mxd)[0]
+layers = arcpy.mapping.ListLayers(mxd)
+
 legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
 legend.autoAdd = False
 
-df = arcpy.mapping.ListDataFrames(mxd)[0]
+for layer in layers:
+    if layer.isRasterLayer and layer.name != "LEYENDA_v2.tif":
+        arcpy.mapping.RemoveLayer(df, layer)
+        print("{} removida".format(layer.name))
 
+# Cargar capa SAVI.tif
 for region in regiones.keys():
-    R=regiones.keys()
+    R = region
+    ruta_anomalia_SAVI_tif = "C:\\Users\\INIA\\Desktop\\2023-06-26_v2\\{0}\\TIF\\ANOMALIA\\{0}_Anomalia_SAVI_median_ZA.tif".format(R)
+    if os.path.exists(ruta_anomalia_SAVI_tif):
+        try:
+            capa_anomalia = arcpy.mapping.Layer(ruta_anomalia_SAVI_tif)
+            arcpy.mapping.AddLayer(df, capa_anomalia, "BOTTOM")
+            print("tif {} añadido".format(R))
+        except Exception as e:
+            print("Error cargando capa para la region {}: {}".format(R, e))
 
-    Anomalia_region=f"C:\Users\INIA\Desktop\2023-06-26_v2\{R}\TIF\ANOMALIA\{R}_Anomalia_SAVI_median_ZA.tif"
+arcpy.RefreshActiveView()
+arcpy.RefreshTOC()
+mxd.save()
+# Extraer solo los nombres y ordenar la lista alfabéticamente
+layer_names = sorted([layer.name for layer in arcpy.mapping.ListLayers(mxd)])
 
-    arcpy.mapping.AddLayer(df,Anomalia_region)
+# Filtrar y almacenar los nombres de las capas que contienen "Anomalia_SAVI"
+anomalia_savi_layers = [name for name in layer_names if "Anomalia_SAVI" in name]
+
+# Contar y mostrar los nombres de las capas
+anomalia_savi_count = len(anomalia_savi_layers)
+print(anomalia_savi_count)
+print(anomalia_savi_layers)
+#SAVI AÑADIDO
 
 
 
-leyenda_layer = arcpy.mapping.ListLayers(mxd, "LEYENDA")[0]
+legend.autoAdd = True
+# Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
+leyenda_layer = arcpy.mapping.ListLayers(mxd, "LEYENDA_v2.tif")[0]
+leyenda_layer.visible = False
+ruta_estilo = "C:\\Users\\INIA\\Desktop\\MAPA_ANOMALIA_PYTHON\\formato\\ANOMALIA\\LEYENDA_TIF.lyr"
+sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
+# Guardar cambios
+mxd.save()
+
+# Usar el método UpdateLayer para aplicar el estilo y asegurarse de que se aplique correctamente
+sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
+
+
+# Guardar cambios
+mxd.save()
+
+
+
 def aplicar_simbologia(region):
     capa_destino = "{}_Anomalia_SAVI_median_ZA.tif".format(region)
     target_layers = arcpy.mapping.ListLayers(mxd, capa_destino)
@@ -46,7 +89,6 @@ def aplicar_simbologia(region):
         arcpy.ApplySymbologyFromLayer_management(target_layer, leyenda_layer)
     else:
         print("No se encontró la capa destino {}".format(capa_destino))
-
 
 
 def remover_capa_glaciares():
@@ -60,12 +102,12 @@ def remover_capa_glaciares():
     legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
     legend.autoAdd = False
 
-remover_capa_glaciares()
 
+remover_capa_glaciares()
 def agregar_capa_leyenda(region):
     if region in ["R11", "R12"]:
         # Paso 1: Añadir la capa "Glaciares" al documento de mapa
-        ruta_glaciares = r"C:\Users\INIA\Desktop\Agosto\ANOMALIA_NDVI\Glaciares.lyr"
+        ruta_glaciares = r"C:\Users\INIA\Desktop\MAPA_ANOMALIA_PYTHON\formato\glaciares y lagos\Glaciares.lyr"
         glaciares_layer = arcpy.mapping.Layer(ruta_glaciares)
         
         # Añadimos la capa "Glaciares" al fondo del marco de datos
@@ -133,7 +175,7 @@ def proceso(region):
             break
 
     # Guarda el PNG
-    carpeta_region = os.path.join("C:\\Users\\INIA\\Desktop\\Agosto\\anomalias", region)
+    carpeta_region = os.path.join(r"C:\Users\INIA\Desktop\MAPA_ANOMALIA_PYTHON\export", region)
 
     if not os.path.exists(carpeta_region):
         os.makedirs(carpeta_region)
@@ -175,3 +217,4 @@ proceso("R15")
 
 print("Script finalizado.")
 
+##falta añadir leyenda, desactivas todo antes de comenzar el script menos regiones 
