@@ -26,14 +26,20 @@ df = arcpy.mapping.ListDataFrames(mxd)[0]
 layers = arcpy.mapping.ListLayers(mxd, "", df)
 legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
 
-# Elimina todas las capas del mxd que contienen la palabra "SAVI"
+# Suponiendo que 'mxd' y 'df' ya están definidos anteriormente en tu código
 layers = arcpy.mapping.ListLayers(mxd, "", df)
-for layer in layers:
-    if "SAVI" in layer.name:
-        arcpy.mapping.RemoveLayer(df, layer)
-        print("{} removida".format(layer.name))
+# Palabras clave para buscar y eliminar
+keywords = ["SAVI", "Lagos_R", "Glaciares_R","Regional"]
 
-# propiedades leyenda
+for layer in layers:
+    for keyword in keywords:
+        if keyword in layer.name:
+            arcpy.mapping.RemoveLayer(df, layer)
+            print("{} removida".format(layer.name))
+            break  # rompe el bucle interno si encuentra una coincidencia para evitar comprobaciones innecesarias
+
+
+#propiedades leyenda
 legend.autoAdd = False
 legend.elementHeight = 4.73845
 legend.elementPositionX = 11.5270
@@ -158,7 +164,7 @@ if "Regional" not in layers_in_mxd:
         try:
             capa_regional = arcpy.mapping.Layer("shape/chile/Regional.shp")
             arcpy.mapping.AddLayer(df, capa_regional, "BOTTOM")
-            capa_regional.visible = False
+            capa_regional.visible = True
             print("Regional.shp añadido al mxd.")
         except Exception as e:
             print("Error cargando capa Regional: {}".format(e))
@@ -183,7 +189,7 @@ for region in regiones.keys():
 
                 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
                 glaciar_layer = arcpy.mapping.ListLayers(mxd, layer_name)[0]
-                ruta_estilo = "formato/glaciares y lagos/Glaciares.lyr" # esto podria ser "{}.lyr".format(region)
+                ruta_estilo = "formato/glaciares_y_lagos/Glaciares.lyr" # esto podria ser "{}.lyr".format(region)
                 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
                 arcpy.mapping.UpdateLayer(df, glaciar_layer, sourceLayer, True)
                 print("estilo glaciares aplicado")
@@ -330,6 +336,14 @@ def proceso(region):
             elem.text = titulo_nuevo
             break
 
+# Asegurarse de que la capa "Regional" está visible
+    regional_layers = arcpy.mapping.ListLayers(mxd, "Regional")
+    if regional_layers:
+        regional_layer = regional_layers[0]
+        regional_layer.visible = True
+        arcpy.RefreshActiveView()
+    else:
+        print("Capa 'Regional' no encontrada.")
     # Guarda el PNG
     carpeta_region = os.path.join("export", region)
 
@@ -354,14 +368,7 @@ def proceso(region):
             layer.visible = False
             arcpy.RefreshActiveView()
 
-    # Asegurarse de que la capa "Regional" está visible
-    regional_layers = arcpy.mapping.ListLayers(mxd, "Regional")
-    if regional_layers:
-        regional_layer = regional_layers[0]
-        regional_layer.visible = True
-        arcpy.RefreshActiveView()
-    else:
-        print("Capa 'Regional' no encontrada.")
+    
 
 mxd.save()
 #Ejecutar el proceso para cada región
@@ -370,7 +377,6 @@ mxd.save()
 proceso("R15")
 proceso("R01")
 proceso("R02")
-
 print("Script finalizado.")
 
 ##mejor crear log.txt para no Ver tanto print en la consola, dejar los mas importantes
