@@ -20,8 +20,8 @@ regiones = {
     "R16": "Región del Ñuble"
 }
 
-#os.chdir("D:/mapas_boletin/mapas_boletin")
-mxd = arcpy.mapping.MapDocument("ANOMALIA_SAVI4.mxd")
+os.chdir("D:/mapas_boletin/mapas_boletin")
+mxd = arcpy.mapping.MapDocument("ANOMALIA_SAVI.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 layers = arcpy.mapping.ListLayers(mxd, "", df)
 legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
@@ -34,16 +34,14 @@ for layer in layers:
         print("{} removida".format(layer.name))
 
 # propiedades leyenda
-legend.autoAdd = True
+legend.autoAdd = False
 legend.elementHeight = 4.73845
 legend.elementPositionX = 11.5270
 legend.elementPositionY = 3.98255
 legend.elementWidth = 2.4576
 
 
-# Guarda los cambios en el MXD
-mxd.save()
-
+#CARGAR ARCHIVOS PARA LEYENDA
 ruta_leyenda_tif = "formato\\LEYENDA_v2.tif"
 # Verificar si la capa de leyenda ya existe en el mxd
 layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
@@ -51,6 +49,7 @@ layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
 if "LEYENDA_v2.tif" not in layers_in_mxd:
     if os.path.exists(ruta_leyenda_tif):
         try:
+            legend.autoAdd = True
             capa_leyenda = arcpy.mapping.Layer(ruta_leyenda_tif)
             arcpy.mapping.AddLayer(df, capa_leyenda, "BOTTOM")
             capa_leyenda.visible = False
@@ -61,6 +60,25 @@ else:
     print("LEYENDA_v2.tif ya está en el mxd.")
 
 
+ruta_lagos_lyr = "formato/glaciares_y_lagos/Lagos.lyr"
+layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
+
+# Cargar capa de Lagos desde el archivo .lyr
+if "Lagos" not in layers_in_mxd:  # Asumiendo que el nombre de la capa en el mxd será "Lagos" al cargarla desde el .lyr
+    if arcpy.Exists(ruta_lagos_lyr):  # Verifica si el archivo .lyr realmente existe
+        try:
+            legend.autoAdd = True
+            capa_lagos = arcpy.mapping.Layer(ruta_lagos_lyr)
+            arcpy.mapping.AddLayer(df, capa_lagos, "BOTTOM")
+            print("Lagos.lyr añadido al mxd.")
+        except Exception as e:
+            print("Error cargando capa de lagos: {}".format(e))
+else:
+    print("La capa 'Lagos' ya está en el mxd.")
+
+
+arcpy.RefreshActiveView()
+arcpy.RefreshTOC()
 
 legend.autoAdd = False
 # Cargar capa SAVI.tif
@@ -80,7 +98,7 @@ for region in regiones.keys():
 # Cargar comunas shp
 for region in regiones.keys():
     R = region
-    ruta_comunas_shp = "shape\\comunas_\\{}.shp".format(R)
+    ruta_comunas_shp = "shape\\comunas\\{}.shp".format(R)
     
     # Verificar si la capa ya existe en el mxd
     capa_existe = arcpy.mapping.ListLayers(mxd, R, df)
@@ -124,7 +142,7 @@ for region in regiones.keys():
 
                  # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
                 Lagos_layer = arcpy.mapping.ListLayers(mxd, "Lagos_{}".format(R))[0]
-                ruta_estilo = "formato/glaciares y lagos/Lagos.lyr" #esto podria ser "{}.lyr".format(region) para vci
+                ruta_estilo = "formato/glaciares_y_lagos/Lagos.lyr" #esto podria ser "{}.lyr".format(region) para vci
                 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
                 arcpy.mapping.UpdateLayer(df, Lagos_layer, sourceLayer, True)
                 print("estilo glaciares aplicado")
@@ -352,9 +370,7 @@ mxd.save()
 proceso("R15")
 proceso("R01")
 proceso("R02")
-proceso("R15")
 
 print("Script finalizado.")
 
-##falta añadir leyenda, mejor crear log.txt para no Ver tanto print en la consola, dejar los mas importantes
-#activar etiquetas de comunas, mxd.save() al final, aplicar simbologia a los lagos 
+##mejor crear log.txt para no Ver tanto print en la consola, dejar los mas importantes
