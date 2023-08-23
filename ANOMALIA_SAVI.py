@@ -268,7 +268,7 @@ remover_capa_glaciares()
 def agregar_capa_leyenda(region):
     if region in ["R11", "R12"]:
         # Paso 1: Añadir la capa "Glaciares" al documento de mapa
-        ruta_glaciares = r"formato\glaciares y lagos\Glaciares.lyr"
+        ruta_glaciares = r"formato\glaciares_y_lagos\Glaciares.lyr"
         glaciares_layer = arcpy.mapping.Layer(ruta_glaciares)
         
         # Añadimos la capa "Glaciares" al inicio del marco de datos
