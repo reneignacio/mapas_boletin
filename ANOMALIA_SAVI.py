@@ -21,14 +21,30 @@ regiones = {
 }
 
 #os.chdir("D:/mapas_boletin/mapas_boletin")
-mxd = arcpy.mapping.MapDocument("ANOMALIA_SAVI3.mxd")
+mxd = arcpy.mapping.MapDocument("ANOMALIA_SAVI4.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 layers = arcpy.mapping.ListLayers(mxd, "", df)
-
 legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
-legend.autoAdd = False
-ruta_leyenda_tif = "formato\\LEYENDA_v2.tif"
 
+# Elimina todas las capas del mxd que contienen la palabra "SAVI"
+layers = arcpy.mapping.ListLayers(mxd, "", df)
+for layer in layers:
+    if "SAVI" in layer.name:
+        arcpy.mapping.RemoveLayer(df, layer)
+        print("{} removida".format(layer.name))
+
+# propiedades leyenda
+legend.autoAdd = True
+legend.elementHeight = 4.73845
+legend.elementPositionX = 11.5270
+legend.elementPositionY = 3.98255
+legend.elementWidth = 2.4576
+
+
+# Guarda los cambios en el MXD
+mxd.save()
+
+ruta_leyenda_tif = "formato\\LEYENDA_v2.tif"
 # Verificar si la capa de leyenda ya existe en el mxd
 layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
 # Cargar capa de leyenda
@@ -44,26 +60,9 @@ if "LEYENDA_v2.tif" not in layers_in_mxd:
 else:
     print("LEYENDA_v2.tif ya está en el mxd.")
 
-# Cargar capa Regional
-if "Regional" not in layers_in_mxd:
-    if os.path.exists("shape/chile/Regional.shp"):
-        try:
-            capa_regional = arcpy.mapping.Layer("shape/chile/Regional.shp")
-            arcpy.mapping.AddLayer(df, capa_regional, "BOTTOM")
-            capa_regional.visible = False
-            print("Regional.shp añadido al mxd.")
-        except Exception as e:
-            print("Error cargando capa Regional: {}".format(e))
-else:
-    print("Regional.shp ya está en el mxd.")
 
 
-for layer in layers:
-    if layer.name != "LEYENDA_v2.tif":
-        arcpy.mapping.RemoveLayer(df, layer)
-        print("{} removida".format(layer.name))
-
-
+legend.autoAdd = False
 # Cargar capa SAVI.tif
 for region in regiones.keys():
     R = region
@@ -77,32 +76,34 @@ for region in regiones.keys():
         except Exception as e:
             print("Error cargando capa SAVI para la region {}: {}".format(R, e))
 
-# Cargar regiones shp
+
+# Cargar comunas shp
 for region in regiones.keys():
     R = region
-    ruta_comunas_shp = "shape\\comunas\\{}.shp".format(R)
+    ruta_comunas_shp = "shape\\comunas_\\{}.shp".format(R)
+    
     # Verificar si la capa ya existe en el mxd
-    layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
-    if R not in layers_in_mxd:
+    capa_existe = arcpy.mapping.ListLayers(mxd, R, df)
+    
+    if capa_existe:
+        layer = capa_existe[0]
         if os.path.exists(ruta_comunas_shp):
             try:
-                capa_lagos = arcpy.mapping.Layer(ruta_comunas_shp)
-                arcpy.mapping.AddLayer(df, capa_lagos, "TOP")
-                capa_lagos.visible = False
-                print("{}.shp añadido".format(R))
-
+                # Reemplazar el origen de datos de la capa existente
+                layer.replaceDataSource(os.path.dirname(ruta_comunas_shp), "SHAPEFILE_WORKSPACE", os.path.basename(ruta_comunas_shp), False)
+                print("Origen de datos de {}.shp actualizado".format(R))
+                
                 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
-                region_layer = arcpy.mapping.ListLayers(mxd, region)[0]
-                ruta_estilo = "formato\\comunas\\comunas_anomalia.lyr" #esto podria ser "{}.lyr".format(region)
+                ruta_estilo = "formato\\comunas\\comunas_anomalia.lyr"
                 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
-                arcpy.mapping.UpdateLayer(df, region_layer, sourceLayer, True)
-                print("estilo comuna aplicado")
-
+                arcpy.mapping.UpdateLayer(df, layer, sourceLayer, True)
+                print("Estilo comuna aplicado a {}".format(R))
+            
             except Exception as e:
-                print("Error cargando capa para la region {}: {}".format(R, e))
+                print("Error actualizando capa para la region {}: {}".format(R, e))
+    
     else:
-        print("{}.shp ya está en el mxd".format(R))
-
+        print("{}.shp no está en el mxd".format(R))
 
 # Cargar lagos 
 for region in regiones.keys():
@@ -117,16 +118,64 @@ for region in regiones.keys():
         if os.path.exists(ruta_lagos_shp):
             try:
                 capa_lagos = arcpy.mapping.Layer(ruta_lagos_shp)
-                arcpy.mapping.AddLayer(df, capa_lagos, "BOTTOM")
+                arcpy.mapping.AddLayer(df, capa_lagos, "TOP")
                 capa_lagos.visible = False
                 print("Lagos_{}.shp añadido".format(R))
+
+                 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
+                Lagos_layer = arcpy.mapping.ListLayers(mxd, "Lagos_{}".format(R))[0]
+                ruta_estilo = "formato/glaciares y lagos/Lagos.lyr" #esto podria ser "{}.lyr".format(region) para vci
+                sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+                arcpy.mapping.UpdateLayer(df, Lagos_layer, sourceLayer, True)
+                print("estilo glaciares aplicado")
             except Exception as e:
                 print("Error cargando capa de lagos para la region {}: {}".format(R, e))
     else:
         print("Lagos_{}.shp ya está en el mxd".format(R))
 
 
+# Cargar capa Regional
+if "Regional" not in layers_in_mxd:
+    if os.path.exists("shape/chile/Regional.shp"):
+        try:
+            capa_regional = arcpy.mapping.Layer("shape/chile/Regional.shp")
+            arcpy.mapping.AddLayer(df, capa_regional, "BOTTOM")
+            capa_regional.visible = False
+            print("Regional.shp añadido al mxd.")
+        except Exception as e:
+            print("Error cargando capa Regional: {}".format(e))
+else:
+    print("Regional.shp ya está en el mxd.")
+# Cargar capa Glaciares
+# Lista de capas ya existentes en el MXD, para evitar listarlas en cada iteración
+layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
 
+for region in regiones.keys():
+    ruta_glaciares_shp = "shape/glaciares/Glaciares_{}.shp".format(region)
+    layer_name = "Glaciares_{}".format(region)
+
+    # Verificar si la capa ya existe en el mxd
+    if layer_name not in layers_in_mxd:
+        if os.path.exists(ruta_glaciares_shp):
+            try:
+                capa_glaciares = arcpy.mapping.Layer(ruta_glaciares_shp)
+                arcpy.mapping.AddLayer(df, capa_glaciares, "TOP")
+                capa_glaciares.visible = False
+                print("Glaciares_{}.shp añadido".format(region))
+
+                # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
+                glaciar_layer = arcpy.mapping.ListLayers(mxd, layer_name)[0]
+                ruta_estilo = "formato/glaciares y lagos/Glaciares.lyr" # esto podria ser "{}.lyr".format(region)
+                sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+                arcpy.mapping.UpdateLayer(df, glaciar_layer, sourceLayer, True)
+                print("estilo glaciares aplicado")
+
+            except Exception as e:
+                print("Error cargando capa  Glaciares para la region {}: {}".format(region, e))
+        else:
+            print("No se encontró el archivo Glaciares_{}.shp".format(region))
+    else:
+        print("Glaciares_{}.shp ya está en el mxd".format(region))
 
 
 # Hacer todas las capas invisibles
@@ -152,33 +201,20 @@ print(anomalia_savi_count)
 print(anomalia_savi_layers)
 #SAVI AÑADIDO
 
- # Añadir la capa leyenda.tif al MXD
-ruta_leyenda_tif = "formato\\LEYENDA_v2.tif"
-try:
-    leyenda_tif_layer = arcpy.mapping.Layer(ruta_leyenda_tif)
-    arcpy.mapping.AddLayer(df, leyenda_tif_layer)
-except Exception as e:
-    print("Error cargando la capa LEYENDA_v2.tif: {}".format(e))
-    # Detiene la ejecución si hay un error al cargar la capa
-    exit()
+#Aplicar estilo a Regiones(Chile)
+Regional_layer = arcpy.mapping.ListLayers(mxd, "Regional")[0]
+Regional_layer.visible = False
+ruta_estilo = "formato/Regional/Regional.lyr"
+sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+arcpy.mapping.UpdateLayer(df, Regional_layer, sourceLayer, True)
 
-arcpy.RefreshActiveView()
-arcpy.RefreshTOC()
-
-legend.autoAdd = True
 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
 leyenda_layer = arcpy.mapping.ListLayers(mxd, "LEYENDA_v2.tif")[0]
 leyenda_layer.visible = False
-ruta_estilo = "formato\\ANOMALIA\\LEYENDA_TIF.lyr"
+ruta_estilo = "formato/ANOMALIA/LEYENDA_TIF.lyr"
 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
 arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
 
-#Aplicar estilo a Regiones(Chile)
-leyenda_layer = arcpy.mapping.ListLayers(mxd, "Regiones")[0]
-leyenda_layer.visible = False
-#ruta_estilo = "formato\\ANOMALIA\\LEYENDA_TIF.lyr" hay que crer otro lyr pq la linea es mas delgada y ploma que las comunas
-sourceLayer = arcpy.mapping.Layer(ruta_estilo)
-arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
 
 def aplicar_simbologia(region):
     capa_destino = "{}_Anomalia_SAVI_median_ZA.tif".format(region)
@@ -309,7 +345,7 @@ def proceso(region):
     else:
         print("Capa 'Regional' no encontrada.")
 
-
+mxd.save()
 #Ejecutar el proceso para cada región
 #for region in regiones.keys():
  #   proceso(region)
