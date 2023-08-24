@@ -20,13 +20,12 @@ regiones = {
     "R16": "Región del Ñuble"
 }
 
-os.chdir("D:/mapas_boletin/mapas_boletin")
+#os.chdir("D:/mapas_boletin/mapas_boletin")
 mxd = arcpy.mapping.MapDocument("ANOMALIA_NDVI.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
-layers = arcpy.mapping.ListLayers(mxd, "", df)
 legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
-# Suponiendo que 'mxd' y 'df' ya están definidos anteriormente en tu código
 layers = arcpy.mapping.ListLayers(mxd, "", df)
+
 # Palabras clave para buscar y eliminar
 keywords = ["NDVI", "Lagos_R", "Glaciares_R","Regional"]
 
@@ -69,7 +68,7 @@ ruta_lagos_lyr = "formato/glaciares_y_lagos/Lagos.lyr"
 layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
 
 # Cargar capa de Lagos desde el archivo .lyr
-if "Lagos" not in layers_in_mxd:  # Asumiendo que el nombre de la capa en el mxd será "Lagos" al cargarla desde el .lyr
+if "Lagos" not in layers_in_mxd:  
     if arcpy.Exists(ruta_lagos_lyr):  # Verifica si el archivo .lyr realmente existe
         try:
             legend.autoAdd = True
@@ -147,7 +146,7 @@ for region in regiones.keys():
 
                  # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
                 Lagos_layer = arcpy.mapping.ListLayers(mxd, "Lagos_{}".format(R))[0]
-                ruta_estilo = "formato/glaciares_y_lagos/Lagos.lyr" #esto podria ser "{}.lyr".format(region) para vci
+                ruta_estilo = "formato/glaciares_y_lagos/Lagos.lyr" 
                 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
                 arcpy.mapping.UpdateLayer(df, Lagos_layer, sourceLayer, True)
                 print("estilo glaciares aplicado")
@@ -188,7 +187,7 @@ for region in regiones.keys():
 
                 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
                 glaciar_layer = arcpy.mapping.ListLayers(mxd, layer_name)[0]
-                ruta_estilo = "formato/glaciares_y_lagos/Glaciares.lyr" # esto podria ser "{}.lyr".format(region)
+                ruta_estilo = "formato/glaciares_y_lagos/Glaciares.lyr" 
                 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
                 arcpy.mapping.UpdateLayer(df, glaciar_layer, sourceLayer, True)
                 print("estilo glaciares aplicado")
@@ -241,13 +240,16 @@ arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
 def aplicar_simbologia(region):
     capa_destino = "{}_Anomalia_NDVI_median_ZA.tif".format(region)
     target_layers = arcpy.mapping.ListLayers(mxd, capa_destino)
-    
-    if target_layers:
-        target_layer = target_layers[0]
-        arcpy.ApplySymbologyFromLayer_management(target_layer, leyenda_layer)
-        print("simbologia aplicada")
-    else:
-        print("No se encontró la capa destino {}".format(capa_destino))
+    try:
+        if target_layers:
+            target_layer = target_layers[0]
+            arcpy.mapping.UpdateLayer(df, target_layer, sourceLayer, True)
+            #arcpy.ApplySymbologyFromLayer_management(target_layer, leyenda_layer)
+            print("simbologia aplicada en {}".format(region))
+        else:
+            print("No se encontró la capa destino {}".format(capa_destino))
+    except Exception as e:
+        print("error al aplicar simbologia en region {}".format(region))        
 
 
 def remover_capa_glaciares():
@@ -256,8 +258,6 @@ def remover_capa_glaciares():
         arcpy.mapping.RemoveLayer(df, lyr)
         arcpy.RefreshActiveView()
     
-    # Paso 5: Desactivar el añadido automático de capas a la leyenda
-    # Suponemos que solo hay una leyenda en el mxd y la obtenemos
     #legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
     #legend.autoAdd = False
 
@@ -272,7 +272,7 @@ def agregar_capa_leyenda(region):
         
         arcpy.mapping.AddLayer(df, glaciares_layer,"BOTTOM")
         arcpy.RefreshActiveView()
-        print("pase por aqui")
+        print("leyenda glaciares añadida")
 
 
 def proceso(region):
@@ -347,7 +347,7 @@ def proceso(region):
     arcpy.RefreshActiveView()  # Refrescar la vista antes de guardar el PNG
     salida_png = os.path.join(carpeta_NDVI, "{}_ANOMALIA_NDVI.png".format(region))
     arcpy.mapping.ExportToPNG(mxd, salida_png, resolution=300, background_color="255, 255, 255")
-    print("png region {} guardado".format(region))
+    print("png {} guardado".format(region))
 
     # Ocultar todas las capas de la región actual después de guardar el PNG
     for capa in capas:
@@ -358,10 +358,15 @@ def proceso(region):
             arcpy.RefreshActiveView()
 
 
-#Ejecutar el proceso para cada región
+#Ejecutar el proceso para cada región menos R01,,R02 Y R15
 for region in regiones.keys():
-    proceso(region)
+    if region != "R01" and region != "R02" and region != "R15":
+        proceso(region)
+    else: print ("{} se calcula con SAVI".format(region))
+
+
 #proceso("R11")
 #proceso("R12")
 #proceso("R02")
+mxd.save()
 print("Script finalizado.")

@@ -20,14 +20,12 @@ regiones = {
     "R16": "Región del Ñuble"
 }
 
-os.chdir("D:/mapas_boletin/mapas_boletin")
+#os.chdir("D:/mapas_boletin/mapas_boletin")
 mxd = arcpy.mapping.MapDocument("ANOMALIA_SAVI.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
-layers = arcpy.mapping.ListLayers(mxd, "", df)
 legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
-
-# Suponiendo que 'mxd' y 'df' ya están definidos anteriormente en tu código
 layers = arcpy.mapping.ListLayers(mxd, "", df)
+
 # Palabras clave para buscar y eliminar
 keywords = ["SAVI", "Lagos_R", "Glaciares_R","Regional"]
 
