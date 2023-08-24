@@ -25,7 +25,6 @@ mxd = arcpy.mapping.MapDocument("ANOMALIA_NDVI.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 layers = arcpy.mapping.ListLayers(mxd, "", df)
 legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
-
 # Suponiendo que 'mxd' y 'df' ya están definidos anteriormente en tu código
 layers = arcpy.mapping.ListLayers(mxd, "", df)
 # Palabras clave para buscar y eliminar
@@ -259,8 +258,8 @@ def remover_capa_glaciares():
     
     # Paso 5: Desactivar el añadido automático de capas a la leyenda
     # Suponemos que solo hay una leyenda en el mxd y la obtenemos
-    legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
-    legend.autoAdd = False
+    #legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
+    #legend.autoAdd = False
 
 
 remover_capa_glaciares()
@@ -277,6 +276,8 @@ def agregar_capa_leyenda(region):
 
 
 def proceso(region):
+    legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
+    legend.autoAdd = True
     aplicar_simbologia(region)
     remover_capa_glaciares()
     # Establecer la visibilidad y el zoom basado en la capa principal de la región
@@ -291,7 +292,7 @@ def proceso(region):
         df.extent = layer_principal.getExtent()
         arcpy.RefreshActiveView()
         
-        #layer_principal.visible = False  # Desactivar la visibilidad después del zoom
+        layer_principal.visible = False  # Desactivar la visibilidad después del zoom
         arcpy.RefreshActiveView()
     else:
         print("No se encontró la capa principal {}".format(region))
@@ -316,7 +317,6 @@ def proceso(region):
         else:
             print("No se encontró la capa {}".format(capa))
 
-    agregar_capa_leyenda(region)
     agregar_capa_leyenda(region)
     # Actualiza el título
     titulo_nuevo = "Anomalia de NDVI del 26 de junio al 11 de julio de 2023, {}".format(regiones[region])
@@ -357,15 +357,11 @@ def proceso(region):
             layer.visible = False
             arcpy.RefreshActiveView()
 
-    
 
-mxd.save()
 #Ejecutar el proceso para cada región
-#for region in regiones.keys():
- #   proceso(region)
-proceso("R11")
-proceso("R12")
+for region in regiones.keys():
+    proceso(region)
+#proceso("R11")
+#proceso("R12")
 #proceso("R02")
 print("Script finalizado.")
-
-##mejor crear log.txt para no Ver tanto print en la consola, dejar los mas importantes
