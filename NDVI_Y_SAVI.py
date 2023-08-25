@@ -20,7 +20,7 @@ regiones = {
     "R16": "Región del Ñuble"
 }
 
-veg_index="SAVI"
+veg_index="NDVI" #SAVI o NDVI
 fecha="26 de junio al 11 de julio de 2023"
 #os.chdir("D:/mapas_boletin/mapas_boletin")
 mxd = arcpy.mapping.MapDocument("ANOMALIA_{}.mxd".format(veg_index))
@@ -63,8 +63,6 @@ if "LEYENDA_v2.tif" not in layers_in_mxd:
             print("Error cargando capa de leyenda: {}".format(e))
 else:
     print("LEYENDA_v2.tif ya está en el mxd.")
-
-
 ruta_lagos_lyr = "formato/glaciares_y_lagos/Lagos.lyr"
 layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
 
@@ -80,25 +78,7 @@ if "Lagos" not in layers_in_mxd:
             print("Error cargando capa de lagos: {}".format(e))
 else:
     print("La capa 'Lagos' ya está en el mxd.")
-
-
-arcpy.RefreshActiveView()
-arcpy.RefreshTOC()
-
-legend.autoAdd = False
-# Cargar capa de indice vegetacional.tif
-for region in regiones.keys():
-    R = region
-    ruta_anomalia_tif = "data\\{0}\\TIF\\ANOMALIA\\{0}_Anomalia_{1}_median_ZA.tif".format(R,veg_index)
-    if os.path.exists(ruta_anomalia_tif):
-        try:
-            capa_anomalia = arcpy.mapping.Layer(ruta_anomalia_tif)
-            arcpy.mapping.AddLayer(df, capa_anomalia, "BOTTOM")
-            capa_anomalia.visible=False
-            print("tif {} añadido".format(R))
-        except Exception as e:
-            print("Error cargando capa {} para la region {}: {}".format(veg_index,R, e))
-
+#fin archivos leyenda
 
 # Cargar comunas shp
 for region in regiones.keys():
@@ -128,50 +108,7 @@ for region in regiones.keys():
     else:
         print("{}.shp no está en el mxd".format(R))
 
-# Cargar lagos 
-for region in regiones.keys():
-    R = region
-    ruta_lagos_shp = "shape\\lagos\\Lagos_{}.shp".format(R)
-
-    # Verificar si la capa de lagos ya existe en el mxd
-    layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
-    layer_name = "Lagos_{}".format(R)
-
-    if layer_name not in layers_in_mxd:
-        if os.path.exists(ruta_lagos_shp):
-            try:
-                capa_lagos = arcpy.mapping.Layer(ruta_lagos_shp)
-                arcpy.mapping.AddLayer(df, capa_lagos, "TOP")
-                capa_lagos.visible = False
-                print("Lagos_{}.shp añadido".format(R))
-
-                 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
-                Lagos_layer = arcpy.mapping.ListLayers(mxd, "Lagos_{}".format(R))[0]
-                ruta_estilo = "formato/glaciares_y_lagos/Lagos.lyr" 
-                sourceLayer = arcpy.mapping.Layer(ruta_estilo)
-                arcpy.mapping.UpdateLayer(df, Lagos_layer, sourceLayer, True)
-                print("estilo glaciares aplicado")
-            except Exception as e:
-                print("Error cargando capa de lagos para la region {}: {}".format(R, e))
-    else:
-        print("Lagos_{}.shp ya está en el mxd".format(R))
-
-
-# Cargar capa Regional
-if "Regional" not in layers_in_mxd:
-    if os.path.exists("shape/chile/Regional.shp"):
-        try:
-            capa_regional = arcpy.mapping.Layer("shape/chile/Regional.shp")
-            arcpy.mapping.AddLayer(df, capa_regional, "BOTTOM")
-            capa_regional.visible = True
-            print("Regional.shp añadido al mxd.")
-        except Exception as e:
-            print("Error cargando capa Regional: {}".format(e))
-else:
-    print("Regional.shp ya está en el mxd.")
 # Cargar capa Glaciares
-
-
 layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
 
 for region in regiones.keys():
@@ -183,7 +120,7 @@ for region in regiones.keys():
         if os.path.exists(ruta_glaciares_shp):
             try:
                 capa_glaciares = arcpy.mapping.Layer(ruta_glaciares_shp)
-                arcpy.mapping.AddLayer(df, capa_glaciares, "TOP")
+                arcpy.mapping.AddLayer(df, capa_glaciares, "BOTTOM")
                 capa_glaciares.visible = False
                 print("Glaciares_{}.shp añadido".format(region))
 
@@ -200,6 +137,65 @@ for region in regiones.keys():
             print("No se encontró el archivo Glaciares_{}.shp".format(region))
     else:
         print("Glaciares_{}.shp ya está en el mxd".format(region))
+
+
+# Cargar lagos 
+for region in regiones.keys():
+    R = region
+    ruta_lagos_shp = "shape\\lagos\\Lagos_{}.shp".format(R)
+
+    # Verificar si la capa de lagos ya existe en el mxd
+    layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
+    layer_name = "Lagos_{}".format(R)
+
+    if layer_name not in layers_in_mxd:
+        if os.path.exists(ruta_lagos_shp):
+            try:
+                capa_lagos = arcpy.mapping.Layer(ruta_lagos_shp)
+                arcpy.mapping.AddLayer(df, capa_lagos, "BOTTOM")
+                capa_lagos.visible = False
+                print("Lagos_{}.shp añadido".format(R))
+
+                 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
+                Lagos_layer = arcpy.mapping.ListLayers(mxd, "Lagos_{}".format(R))[0]
+                ruta_estilo = "formato/glaciares_y_lagos/Lagos.lyr" 
+                sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+                arcpy.mapping.UpdateLayer(df, Lagos_layer, sourceLayer, True)
+                print("estilo glaciares aplicado")
+            except Exception as e:
+                print("Error cargando capa de lagos para la region {}: {}".format(R, e))
+    else:
+        print("Lagos_{}.shp ya está en el mxd".format(R))
+
+arcpy.RefreshActiveView()
+arcpy.RefreshTOC()
+legend.autoAdd = False
+
+# Cargar capa de indice vegetacional.tif
+for region in regiones.keys():
+    R = region
+    ruta_anomalia_tif = "data\\{0}\\TIF\\ANOMALIA\\{0}_Anomalia_{1}_median_ZA.tif".format(R,veg_index)
+    if os.path.exists(ruta_anomalia_tif):
+        try:
+            capa_anomalia = arcpy.mapping.Layer(ruta_anomalia_tif)
+            arcpy.mapping.AddLayer(df, capa_anomalia, "BOTTOM")
+            capa_anomalia.visible=False
+            print("tif {} añadido".format(R))
+        except Exception as e:
+            print("Error cargando capa {} para la region {}: {}".format(veg_index,R, e))
+
+# Cargar capa Regional
+if "Regional" not in layers_in_mxd:
+    if os.path.exists("shape/chile/Regional.shp"):
+        try:
+            capa_regional = arcpy.mapping.Layer("shape/chile/Regional.shp")
+            arcpy.mapping.AddLayer(df, capa_regional, "BOTTOM")
+            capa_regional.visible = True
+            print("Regional.shp añadido al mxd.")
+        except Exception as e:
+            print("Error cargando capa Regional: {}".format(e))
+else:
+    print("Regional.shp ya está en el mxd.")
 
 
 # Hacer todas las capas invisibles
@@ -259,9 +255,6 @@ def remover_capa_glaciares():
     for lyr in arcpy.mapping.ListLayers(mxd, "Glaciares"):
         arcpy.mapping.RemoveLayer(df, lyr)
         arcpy.RefreshActiveView()
-    
-    #legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
-    #legend.autoAdd = False
 
 
 remover_capa_glaciares()
