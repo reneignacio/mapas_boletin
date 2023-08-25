@@ -126,7 +126,7 @@ for region in regiones.keys():
 
                 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
                 glaciar_layer = arcpy.mapping.ListLayers(mxd, layer_name)[0]
-                ruta_estilo = "formato/glaciares_y_lagos/Glaciares.lyr" 
+                ruta_estilo = "formato/glaciares_y_lagos/Glaciares2.lyr" 
                 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
                 arcpy.mapping.UpdateLayer(df, glaciar_layer, sourceLayer, True)
                 print("estilo glaciares aplicado")
@@ -262,7 +262,7 @@ def agregar_capa_leyenda(region):
     if region in ["R11", "R12"]:
         legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
         legend.autoAdd = True
-        ruta_glaciares = "formato/glaciares_y_lagos/Glaciares.lyr"
+        ruta_glaciares = "formato/glaciares_y_lagos/Glaciares2.lyr"
         glaciares_layer = arcpy.mapping.Layer(ruta_glaciares)
         
         arcpy.mapping.AddLayer(df, glaciares_layer,"BOTTOM")
