@@ -36,8 +36,7 @@ for layer in layers:
         if keyword in layer.name:
             arcpy.mapping.RemoveLayer(df, layer)
             print("{} removida".format(layer.name))
-            break  # rompe el bucle interno si encuentra una coincidencia para evitar comprobaciones innecesarias
-
+            break  
 
 #propiedades leyenda
 legend.autoAdd = False
@@ -283,12 +282,10 @@ def proceso(region):
     legend.autoAdd = True
     aplicar_simbologia(region)
     remover_capa_glaciares()
-    # Establecer la visibilidad y el zoom basado en la capa principal de la región
+    # Establecer la visibilidad y el zoom basado de la región
     layer_principal_list = arcpy.mapping.ListLayers(mxd, region)
     if layer_principal_list:
         layer_principal = layer_principal_list[0]
-        layer_principal.visible = True
-        layer_principal.visible = True
         arcpy.RefreshActiveView()
         
         df = arcpy.mapping.ListDataFrames(mxd)[0]
@@ -361,13 +358,13 @@ def proceso(region):
             arcpy.RefreshActiveView()
 
 
-#Ejecutar el proceso para cada región menos R01,,R02 Y R15
+
 if veg_index=="NDVI":
     for region in regiones.keys():
         if region != "R01" and region != "R02" and region != "R15":
             proceso(region)
         else: print ("{} se calcula con SAVI".format(region))
-    print("Script finalizado, veg_index=SAVI")
+    print("Script finalizado, veg_index=NDVI")
 
 elif veg_index=="SAVI":
     proceso("R01")
