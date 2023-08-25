@@ -351,3 +351,6 @@ proceso("R16")
 proceso("R08")
 print("Script finalizado")
 mxd.save()
+
+#FALTA QUITAR LAGOS Y GLACIARES, ADEMAS ALGUNAS REGIONES VAN HORIZONTAL Y OTRAS VERTICAL,
+#  EN ALGUNAS CAMBIA LA ESTRELLA DE LUGAR Y LA LEYENDA, od ejar leyenda con fondo blanco nomas
