@@ -29,8 +29,7 @@ legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
 layers = arcpy.mapping.ListLayers(mxd, "", df)
 
 # Palabras clave para buscar y eliminar
-keywords = ["{}", "Lagos_R", "Glaciares_R","Regional".format(veg_index)]
-
+keywords = [veg_index, "Lagos_R", "Glaciares_R","Regional"]
 for layer in layers:
     for keyword in keywords:
         if keyword in layer.name:
@@ -259,7 +258,7 @@ def remover_capa_glaciares():
 
 remover_capa_glaciares()
 def agregar_capa_leyenda(region):
-    if region in ["R11", "R12"]:
+    if region in ["R10","R11","R12"]:
         legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
         legend.autoAdd = True
         ruta_glaciares = "formato/glaciares_y_lagos/Glaciares2.lyr"
@@ -298,7 +297,8 @@ def proceso(region):
 
     capas.extend(["{}_Anomalia_{}_median_ZA.tif".format(region,veg_index), "Lagos_{}".format(region)])
     
-    if region in ["R11", "R12"]:
+    #ACTIVA CAPA GLACIARES
+    if region in [ "R10","R11", "R12"]:
         capas.append("Glaciares_{}".format(region))
 
     for capa in capas:
@@ -349,7 +349,6 @@ def proceso(region):
             layer = layer_list[0]
             layer.visible = False
             arcpy.RefreshActiveView()
-
 
 
 if veg_index=="NDVI":
