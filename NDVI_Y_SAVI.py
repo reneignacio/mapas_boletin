@@ -71,7 +71,7 @@ for veg_index in veg_index_:
     else:
         print("La capa 'Lagos' ya está en el mxd.")
     #fin archivos leyenda
-
+    legend.autoAdd = False
     # Cargar comunas shp
     for region in regiones.keys():
         R = region
