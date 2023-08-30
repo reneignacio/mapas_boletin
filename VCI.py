@@ -387,7 +387,8 @@ for mxd_doc in orientacion:
         x=1
 if  x+y==2:
     print("vci horizontal y vertical finalizado")
-        #FALTA QUITAR LAGOS Y GLACIARES, ADEMAS ALGUNAS REGIONES VAN HORIZONTAL Y OTRAS VERTICAL,
-        #  EN ALGUNAS CAMBIA LA ESTRELLA DE LUGAR Y LA LEYENDA, od ejar leyenda con fondo blanco nomas
+       
 else : 
     print("algo pasó")
+
+#revisar si van lagos y glaciares
