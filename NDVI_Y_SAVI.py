@@ -21,11 +21,13 @@ regiones = {
 }
 #os.chdir("D:/mapas_boletin/mapas_boletin")
 veg_index_=["NDVI","SAVI"]
-veg_index_=["NDVI","NDVI"]
 fecha="26 de junio al 11 de julio de 2023"
 mxd = arcpy.mapping.MapDocument("NDVI_horizontal.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
-
+df0 = arcpy.mapping.ListDataFrames(mxd)[0]
+df1=arcpy.mapping.ListDataFrames(mxd)[1]
+df2=arcpy.mapping.ListDataFrames(mxd)[2]
+df3=arcpy.mapping.ListDataFrames(mxd)[3]
 for veg_index in veg_index_:
     df = arcpy.mapping.ListDataFrames(mxd)[0]
     lyr="Act"
@@ -310,6 +312,189 @@ for veg_index in veg_index_:
     sourceLayer = arcpy.mapping.Layer(ruta_estilo)
     arcpy.mapping.UpdateLayer(df, Regional_layer, sourceLayer, True)
 
+    #----------------------------------------------------------------------------------------
+    #archivos dataframe 1 subidos
+    #DATAFRAME2
+    lyr="Med"
+    df = arcpy.mapping.ListDataFrames(mxd)[2]
+    legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
+    legend.autoAdd = False
+    layers = arcpy.mapping.ListLayers(mxd, "", df)  
+
+    # Palabras clave para buscar y eliminar
+    keywords = [veg_index,"Regional"]
+    for layer in layers:
+        for keyword in keywords:
+            if keyword in layer.name:
+                arcpy.mapping.RemoveLayer(df, layer)
+                print("{} removida".format(layer.name))
+                break  
+    
+    # Cargar comunas shp
+    for region in regiones.keys():
+        R = region
+        ruta_comunas_shp = "shape\\comunas\\{}.shp".format(R)
+        
+        # Verificar si la capa ya existe en el mxd
+        capa_existe = arcpy.mapping.ListLayers(mxd, R, df)
+        
+        if capa_existe:
+            layer = capa_existe[0]
+            if os.path.exists(ruta_comunas_shp):
+                try:
+                    # Reemplazar el origen de datos de la capa existente
+                    layer.replaceDataSource(os.path.dirname(ruta_comunas_shp), "SHAPEFILE_WORKSPACE", os.path.basename(ruta_comunas_shp), False)
+                    print("Origen de datos de {}.shp actualizado".format(R))
+                    
+                    # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
+                    ruta_estilo = "formato\\comunas\\comunas_NDVI.lyr"
+                    sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+                    arcpy.mapping.UpdateLayer(df, layer, sourceLayer, True)
+                    print("Estilo comuna aplicado a {}".format(R))
+                
+                except Exception as e:
+                    print("Error actualizando capa para la region {}: {}".format(R, e))
+        
+        else:
+            print("{}.shp no está en el mxd".format(R))
+
+
+    # Cargar capa de indice vegetacional.tif
+    for region in regiones.keys():
+        R = region
+        ruta_anomalia_tif = "data\\{0}\\TIF\\{2}\\{0}_{1}_{2}.tif".format(R,lyr,veg_index)
+        if os.path.exists(ruta_anomalia_tif):
+            try:
+                capa_anomalia = arcpy.mapping.Layer(ruta_anomalia_tif)
+                arcpy.mapping.AddLayer(df, capa_anomalia, "BOTTOM")
+                capa_anomalia.visible=False
+                print("tif {} añadido".format(R))
+            except Exception as e:
+                print("Error cargando capa {} para la region {}: {}".format(veg_index,R, e))
+
+
+    # Hacer todas las capas invisibles
+    layers = arcpy.mapping.ListLayers(mxd, "", df)
+    for layer in layers:
+        try:
+            layer.visible = False
+        except Exception as e:
+            print("Error con la capa: {}. Error: {}".format(layer.name,e))
+
+    arcpy.RefreshActiveView()
+    arcpy.RefreshTOC()
+    # Cargar capa Regional
+    if "Regional" not in layers_in_mxd:
+        if os.path.exists("shape/chile/Regional.shp"):
+            try:
+                capa_regional = arcpy.mapping.Layer("shape/chile/Regional.shp")
+                arcpy.mapping.AddLayer(df, capa_regional, "BOTTOM")
+                capa_regional.visible = True
+                print("Regional.shp añadido al mxd.")
+            except Exception as e:
+                print("Error cargando capa Regional: {}".format(e))
+    else:
+        print("Regional.shp ya está en el mxd.")
+
+    #Aplicar estilo a Regiones(Chile)
+    Regional_layer = arcpy.mapping.ListLayers(mxd, "Regional",df)[0]
+    Regional_layer.visible = True
+    ruta_estilo = "formato/Regional/Regional.lyr"
+    sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+    arcpy.mapping.UpdateLayer(df, Regional_layer, sourceLayer, True)
+
+#----------------------------------------------------------------------------------------
+    #archivos dataframe 2 subidos
+    #DATAFRAME3
+    lyr="Max"
+    df = arcpy.mapping.ListDataFrames(mxd)[3]
+    legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
+    legend.autoAdd = False
+    layers = arcpy.mapping.ListLayers(mxd, "", df)  
+
+    # Palabras clave para buscar y eliminar
+    keywords = [veg_index,"Regional"]
+    for layer in layers:
+        for keyword in keywords:
+            if keyword in layer.name:
+                arcpy.mapping.RemoveLayer(df, layer)
+                print("{} removida".format(layer.name))
+                break  
+    
+    # Cargar comunas shp
+    for region in regiones.keys():
+        R = region
+        ruta_comunas_shp = "shape\\comunas\\{}.shp".format(R)
+        
+        # Verificar si la capa ya existe en el mxd
+        capa_existe = arcpy.mapping.ListLayers(mxd, R, df)
+        
+        if capa_existe:
+            layer = capa_existe[0]
+            if os.path.exists(ruta_comunas_shp):
+                try:
+                    # Reemplazar el origen de datos de la capa existente
+                    layer.replaceDataSource(os.path.dirname(ruta_comunas_shp), "SHAPEFILE_WORKSPACE", os.path.basename(ruta_comunas_shp), False)
+                    print("Origen de datos de {}.shp actualizado".format(R))
+                    
+                    # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
+                    ruta_estilo = "formato\\comunas\\comunas_NDVI.lyr"
+                    sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+                    arcpy.mapping.UpdateLayer(df, layer, sourceLayer, True)
+                    print("Estilo comuna aplicado a {}".format(R))
+                
+                except Exception as e:
+                    print("Error actualizando capa para la region {}: {}".format(R, e))
+        
+        else:
+            print("{}.shp no está en el mxd".format(R))
+
+
+    # Cargar capa de indice vegetacional.tif
+    for region in regiones.keys():
+        R = region
+        ruta_anomalia_tif = "data\\{0}\\TIF\\{2}\\{0}_{1}_{2}.tif".format(R,lyr,veg_index)
+        if os.path.exists(ruta_anomalia_tif):
+            try:
+                capa_anomalia = arcpy.mapping.Layer(ruta_anomalia_tif)
+                arcpy.mapping.AddLayer(df, capa_anomalia, "BOTTOM")
+                capa_anomalia.visible=False
+                print("tif {} añadido".format(R))
+            except Exception as e:
+                print("Error cargando capa {} para la region {}: {}".format(veg_index,R, e))
+
+
+    # Hacer todas las capas invisibles
+    layers = arcpy.mapping.ListLayers(mxd, "", df)
+    for layer in layers:
+        try:
+            layer.visible = False
+        except Exception as e:
+            print("Error con la capa: {}. Error: {}".format(layer.name,e))
+
+    arcpy.RefreshActiveView()
+    arcpy.RefreshTOC()
+    # Cargar capa Regional
+    if "Regional" not in layers_in_mxd:
+        if os.path.exists("shape/chile/Regional.shp"):
+            try:
+                capa_regional = arcpy.mapping.Layer("shape/chile/Regional.shp")
+                arcpy.mapping.AddLayer(df, capa_regional, "BOTTOM")
+                capa_regional.visible = True
+                print("Regional.shp añadido al mxd.")
+            except Exception as e:
+                print("Error cargando capa Regional: {}".format(e))
+    else:
+        print("Regional.shp ya está en el mxd.")
+
+    #Aplicar estilo a Regiones(Chile)
+    Regional_layer = arcpy.mapping.ListLayers(mxd, "Regional",df)[0]
+    Regional_layer.visible = True
+    ruta_estilo = "formato/Regional/Regional.lyr"
+    sourceLayer = arcpy.mapping.Layer(ruta_estilo)
+    arcpy.mapping.UpdateLayer(df, Regional_layer, sourceLayer, True)
+
+
 
     def aplicar_simbologia(region,lyr,df):
         ruta_estilo = "formato/NDVI/ndvi_prueba_eliminar.lyr"
@@ -432,10 +617,56 @@ for veg_index in veg_index_:
         else:
             print("Capa 'Regional' no encontrada.")
 
-        tif="{}_{}_{}.tif".format(region,lyr,veg_index)
+
+
+#eliminar quizas
+        aplicar_simbologia(region,lyr,df)
+        remover_capa_glaciares()
+        # Establecer la visibilidad y el zoom basado de la región
+        layer_principal_list = arcpy.mapping.ListLayers(mxd, region,df)
+        if layer_principal_list:
+            layer_principal = layer_principal_list[0]
+            arcpy.RefreshActiveView()
+            
+            df.extent = layer_principal.getExtent()
+            arcpy.RefreshActiveView()
+            
+            #layer_principal.visible = False  # Desactivar la visibilidad después del zoom
+            #arcpy.RefreshActiveView()
+        else:
+            print("No se encontró la capa principal {}".format(region))
+            return
+
+        if region == "R13":
+            capas = [layer.name for layer in arcpy.mapping.ListLayers(mxd) if layer.name == "R13"]
+        else:
+            capas = [region]
+
+        capas.extend(["{}_{}_{}.tif".format(region,lyr,veg_index), "Lagos_{}".format(region)])
+        
+     
+
+        for capa in capas:
+            layer_list = arcpy.mapping.ListLayers(mxd, capa,df)
+            if layer_list:
+                layer = layer_list[0]
+                layer.visible = True
+                arcpy.RefreshActiveView()
+            else:
+                print("No se encontró la capa {}".format(capa))
+
+
+
+
+
+
+
+
+
+        tif1="{}_{}_{}.tif".format(region,lyr,veg_index)
         # Asegurarse de que la capa "tif" está visible
         df = arcpy.mapping.ListDataFrames(mxd)[1]
-        tif_layers = arcpy.mapping.ListLayers(mxd,tif,df)
+        tif_layers = arcpy.mapping.ListLayers(mxd,tif1,df)
         if tif_layers:
             tif_layer = tif_layers[0]
             tif_layer.visible = True
@@ -443,7 +674,107 @@ for veg_index in veg_index_:
         else:
             print("Capa 'TIF' no encontrada.")
 
+        ##--------------------------------------------------------------------------------------------
+        #comienzo Dataframe 2
+        df = arcpy.mapping.ListDataFrames(mxd)[2]
+        lyr="Med"
+        aplicar_simbologia(region,lyr,df)
+        # Establecer la visibilidad y el zoom basado de la región
+        layer_principal_list = arcpy.mapping.ListLayers(mxd, region, df)
+        if layer_principal_list:
+            layer_principal = layer_principal_list[0]
+            arcpy.RefreshActiveView()
+            
+            df = arcpy.mapping.ListDataFrames(mxd)[2]
+            df.extent = layer_principal.getExtent()
+            arcpy.RefreshActiveView()
+            
+            #layer_principal.visible = False  # Desactivar la visibilidad después del zoom
+            #arcpy.RefreshActiveView()
+        else:
+            print("No se encontró la capa principal {}".format(region))
+            return
+
+        # Asegurarse de que la capa "Regional" está visible
+        regional_layers = arcpy.mapping.ListLayers(mxd, "Regional",df)
+        if regional_layers:
+            regional_layer = regional_layers[0]
+            regional_layer.visible = True
+            arcpy.RefreshActiveView()
+        else:
+            print("Capa 'Regional' no encontrada.")
+
+        tif2="{}_{}_{}.tif".format(region,lyr,veg_index)
+        # Asegurarse de que la capa "tif" está visible
+        df = arcpy.mapping.ListDataFrames(mxd)[2]
+        tif_layers = arcpy.mapping.ListLayers(mxd,tif2,df)
+        if tif_layers:
+            tif_layer = tif_layers[0]
+            tif_layer.visible = True
+            arcpy.RefreshActiveView()
+        else:
+            print("Capa 'TIF' no encontrada.")
+        ##--------------------------------------------------------------------------------------------
+        #comienzo Dataframe 3
+        df = arcpy.mapping.ListDataFrames(mxd)[3]
+        lyr="Max"
+        aplicar_simbologia(region,lyr,df)
+        # Establecer la visibilidad y el zoom basado de la región
+        layer_principal_list = arcpy.mapping.ListLayers(mxd, region, df)
+        if layer_principal_list:
+            layer_principal = layer_principal_list[0]
+            arcpy.RefreshActiveView()
+            
+            df = arcpy.mapping.ListDataFrames(mxd)[3]
+            df.extent = layer_principal.getExtent()
+            arcpy.RefreshActiveView()
+            
+            #layer_principal.visible = False  # Desactivar la visibilidad después del zoom
+            #arcpy.RefreshActiveView()
+        else:
+            print("No se encontró la capa principal {}".format(region))
+            return
+
+        # Asegurarse de que la capa "Regional" está visible
+        regional_layers = arcpy.mapping.ListLayers(mxd, "Regional",df)
+        if regional_layers:
+            regional_layer = regional_layers[0]
+            regional_layer.visible = True
+            arcpy.RefreshActiveView()
+        else:
+            print("Capa 'Regional' no encontrada.")
+
+        tif3="{}_{}_{}.tif".format(region,lyr,veg_index)
+        # Asegurarse de que la capa "tif" está visible
+        df = arcpy.mapping.ListDataFrames(mxd)[3]
+        tif_layers = arcpy.mapping.ListLayers(mxd,tif3,df)
+        if tif_layers:
+            tif_layer = tif_layers[0]
+            tif_layer.visible = True
+            arcpy.RefreshActiveView()
+        else:
+            print("Capa 'TIF' no encontrada.")
+
+
+
+        # Empareja cada TIF con su dataframe correspondiente
+        df_tif_pairs = [(df1, tif1), (df2, tif2), (df3, tif3)]
+
+        # Itera a través de cada par de dataframe-TIF
+        for current_df, tif_name in df_tif_pairs:
+            # Lista todas las capas en el mxd del dataframe en cuestión
+            all_layers = arcpy.mapping.ListLayers(mxd, "", current_df)
+            
+            # Recorre cada capa y ocúltala si no es "Regional" o el TIF correspondiente
+            for layer in all_layers:
+                if layer.name not in ["Regional", tif_name]:
+                    layer.visible = False
+            
+            arcpy.RefreshActiveView()
         mxd.save()
+
+
+
         # Guarda el PNG
         carpeta_region = os.path.join("export", region)
 
@@ -454,21 +785,38 @@ for veg_index in veg_index_:
         carpeta = os.path.join(carpeta_region, "{}".format(veg_index))
         if not os.path.exists(carpeta):
             os.makedirs(carpeta)
-        
+       
         arcpy.RefreshActiveView()  # Refrescar la vista antes de guardar el PNG
         salida_png = os.path.join(carpeta, "{}_{}.png".format(region,veg_index))
         arcpy.mapping.ExportToPNG(mxd, salida_png, resolution=300, background_color="255, 255, 255")
         print("png {} guardado".format(region))
 
         # Asegurarse de que la capa "tif" se desactiva despues de guardar
-        df = arcpy.mapping.ListDataFrames(mxd)[1]
-        tif_layers = arcpy.mapping.ListLayers(mxd,tif,df)
+        tif_layers = arcpy.mapping.ListLayers(mxd,tif1,df1)
         if tif_layers:
             tif_layer = tif_layers[0]
             tif_layer.visible = False
             arcpy.RefreshActiveView()
         else:
-            print("Capa 'TIF' no encontrada.")
+            print("Capa 'TIF' df1 no encontrada.")
+            
+            # Asegurarse de que la capa "tif" se desactiva despues de guardar
+        tif_layers = arcpy.mapping.ListLayers(mxd,tif2,df2)
+        if tif_layers:
+            tif_layer = tif_layers[0]
+            tif_layer.visible = False
+            arcpy.RefreshActiveView()
+        else:
+            print("Capa 'TIF' df2no encontrada.")
+            
+        # Asegurarse de que la capa "tif" se desactiva despues de guardar
+        tif_layers = arcpy.mapping.ListLayers(mxd,tif3,df3)
+        if tif_layers:
+            tif_layer = tif_layers[0]
+            tif_layer.visible = False
+            arcpy.RefreshActiveView()
+        else:
+            print("Capa 'TIF'df3 no encontrada.")
         # Ocultar todas las capas de la región actual después de guardar el PNG
         for capa in capas:
             layer_list = arcpy.mapping.ListLayers(mxd, capa)
@@ -477,25 +825,40 @@ for veg_index in veg_index_:
                 layer.visible = False
                 arcpy.RefreshActiveView()
 
+        # Lista de dataframes de interés
+        dfs = [df1, df2, df3]  # y así sucesivamente
 
-""" proceso("R16")
-proceso("R08")
-proceso("R05")
- """
+        # Ocultar todas las capas de la región actual después de guardar el PNG para cada dataframe
+        for df in dfs:
+            for capa in capas:
+                layer_list = arcpy.mapping.ListLayers(mxd, capa, df)
+                if layer_list:
+                    layer = layer_list[0]
+                    layer.visible = False
+            arcpy.RefreshActiveView()
 
 
-if veg_index=="NDVI":
-        for region in regiones.keys():
-            if region != "R01" and region != "R02" and region != "R15":
-                proceso(region)
-            else: print ("{} se calcula con SAVI".format(region))
-        #mxd.save()
-        print("Script finalizado, veg_index=NDVI")
 
-elif veg_index=="SAVI":
-        proceso("R01")
-        proceso("R02")
-        proceso("R15")
-        #mxd.save()
-        print("Script finalizado, veg_index=SAVI")
+
+
+            """ proceso("R16")
+            proceso("R08")
+            proceso("R05")
+            """
+
+
+    if veg_index=="NDVI":
+            for region in regiones.keys():
+                if region != "R01" and region != "R02" and region != "R15":
+                    proceso(region)
+                else: print ("{} se calcula con SAVI".format(region))
+            #mxd.save()
+            print("Script finalizado, veg_index=NDVI")
+
+    elif veg_index=="SAVI":
+            proceso("R01")
+            proceso("R02")
+            proceso("R15")
+            #mxd.save()
+            print("Script finalizado, veg_index=SAVI")
 
