@@ -587,6 +587,16 @@ for veg_index in veg_index_:
                 elem.text = titulo_nuevo
                 break
 
+        tif0="{}_{}_{}.tif".format(region,lyr,veg_index)
+        # Asegurarse de que la capa "tif" está visible
+        df = arcpy.mapping.ListDataFrames(mxd)[0]
+        tif_layers = arcpy.mapping.ListLayers(mxd,tif0,df)
+        if tif_layers:
+            tif_layer = tif_layers[0]
+            tif_layer.visible = True
+            arcpy.RefreshActiveView()
+        else:
+            print("Capa 'TIF0' act no encontrada.")           
         ##--------------------------------------------------------------------------------------------
         #comienzo Dataframe 1
         df = arcpy.mapping.ListDataFrames(mxd)[1]
@@ -616,51 +626,6 @@ for veg_index in veg_index_:
             arcpy.RefreshActiveView()
         else:
             print("Capa 'Regional' no encontrada.")
-
-
-
-#eliminar quizas
-        aplicar_simbologia(region,lyr,df)
-        remover_capa_glaciares()
-        # Establecer la visibilidad y el zoom basado de la región
-        layer_principal_list = arcpy.mapping.ListLayers(mxd, region,df)
-        if layer_principal_list:
-            layer_principal = layer_principal_list[0]
-            arcpy.RefreshActiveView()
-            
-            df.extent = layer_principal.getExtent()
-            arcpy.RefreshActiveView()
-            
-            #layer_principal.visible = False  # Desactivar la visibilidad después del zoom
-            #arcpy.RefreshActiveView()
-        else:
-            print("No se encontró la capa principal {}".format(region))
-            return
-
-        if region == "R13":
-            capas = [layer.name for layer in arcpy.mapping.ListLayers(mxd) if layer.name == "R13"]
-        else:
-            capas = [region]
-
-        capas.extend(["{}_{}_{}.tif".format(region,lyr,veg_index), "Lagos_{}".format(region)])
-        
-     
-
-        for capa in capas:
-            layer_list = arcpy.mapping.ListLayers(mxd, capa,df)
-            if layer_list:
-                layer = layer_list[0]
-                layer.visible = True
-                arcpy.RefreshActiveView()
-            else:
-                print("No se encontró la capa {}".format(capa))
-
-
-
-
-
-
-
 
 
         tif1="{}_{}_{}.tif".format(region,lyr,veg_index)
@@ -771,7 +736,7 @@ for veg_index in veg_index_:
                     layer.visible = False
             
             arcpy.RefreshActiveView()
-        mxd.save()
+    
 
 
 
