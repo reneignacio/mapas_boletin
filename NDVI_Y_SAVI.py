@@ -460,6 +460,15 @@ for veg_index in veg_index_:
         arcpy.mapping.ExportToPNG(mxd, salida_png, resolution=300, background_color="255, 255, 255")
         print("png {} guardado".format(region))
 
+        # Asegurarse de que la capa "tif" se desactiva despues de guardar
+        df = arcpy.mapping.ListDataFrames(mxd)[1]
+        tif_layers = arcpy.mapping.ListLayers(mxd,tif,df)
+        if tif_layers:
+            tif_layer = tif_layers[0]
+            tif_layer.visible = False
+            arcpy.RefreshActiveView()
+        else:
+            print("Capa 'TIF' no encontrada.")
         # Ocultar todas las capas de la región actual después de guardar el PNG
         for capa in capas:
             layer_list = arcpy.mapping.ListLayers(mxd, capa)
