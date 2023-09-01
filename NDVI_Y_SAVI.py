@@ -519,7 +519,7 @@ for veg_index in veg_index_:
     def remover_capa_glaciares():
         # Encuentra y elimina la capa "Glaciares" si existe
         for lyr in arcpy.mapping.ListLayers(mxd, "Glaciares"):
-            arcpy.mapping.RemoveLayer(df, lyr)
+            arcpy.mapping.RemoveLayer(df0, lyr)
             arcpy.RefreshActiveView()
 
 
@@ -531,9 +531,10 @@ for veg_index in veg_index_:
             ruta_glaciares = "formato/glaciares_y_lagos/Glaciares2.lyr"
             glaciares_layer = arcpy.mapping.Layer(ruta_glaciares)
             
-            arcpy.mapping.AddLayer(df, glaciares_layer,"BOTTOM")
+            arcpy.mapping.AddLayer(df0, glaciares_layer,"BOTTOM")
             arcpy.RefreshActiveView()
             print("leyenda glaciares añadida")
+            legend.autoAdd = False
 
 
     def proceso(region):
@@ -580,12 +581,19 @@ for veg_index in veg_index_:
                 print("No se encontró la capa {}".format(capa))
 
         agregar_capa_leyenda(region)
+
         # Actualiza el título
-        titulo_nuevo = "Indice de Vegetacion de Diferencia Normalizada ({}) de la {} \n{}".format(veg_index,regiones[region],fecha)
+        if region =="R11":
+             titulo_nuevo = "{} de la {}, {}".format(veg_index,regiones[region],fecha)   
+        
+        else:
+            if veg_index=="NDVI": 
+                titulo_nuevo = "Indice de Vegetacion de Diferencia Normalizada ({}) de la {} \n{}".format(veg_index,regiones[region],fecha)
+            elif veg_index=="SAVI": 
+                titulo_nuevo = "Indice de Vegetacion Ajustado al Suelo ({}) de la {} \n{}".format(veg_index,regiones[region],fecha)
+
         for elem in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
-            if "Indice" in elem.text:
-                elem.text = titulo_nuevo
-                break
+            elem.text = titulo_nuevo
 
         tif0="{}_{}_{}.tif".format(region,lyr,veg_index)
         # Asegurarse de que la capa "tif" está visible
@@ -738,8 +746,6 @@ for veg_index in veg_index_:
             arcpy.RefreshActiveView()
     
 
-
-
         # Guarda el PNG
         carpeta_region = os.path.join("export", region)
 
@@ -802,14 +808,6 @@ for veg_index in veg_index_:
                     layer.visible = False
             arcpy.RefreshActiveView()
 
-
-
-
-
-            """ proceso("R16")
-            proceso("R08")
-            proceso("R05")
-            """
 
 
     if veg_index=="NDVI":
