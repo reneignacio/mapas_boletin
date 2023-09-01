@@ -222,7 +222,7 @@ for veg_index in veg_index_:
     # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
     leyenda_layer = arcpy.mapping.ListLayers(mxd, "LEYENDA_v2.tif")[0]
     leyenda_layer.visible = False
-    ruta_estilo = "formato/DIFERENCIA/LEYENDA_DIFERENCIA.lyr"
+    ruta_estilo = "formato/DIFERENCIA/LEYENDA_DIFERENCIA_prueba_eliminar.lyr"
     sourceLayer = arcpy.mapping.Layer(ruta_estilo)
     arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
 

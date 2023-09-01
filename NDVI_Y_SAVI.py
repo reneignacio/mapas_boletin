@@ -593,7 +593,10 @@ for veg_index in veg_index_:
                 titulo_nuevo = "Indice de Vegetacion Ajustado al Suelo ({}) de la {} \n{}".format(veg_index,regiones[region],fecha)
 
         for elem in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
-            elem.text = titulo_nuevo
+            if "de" in elem.text:
+                elem.text = titulo_nuevo
+                break
+
 
         tif0="{}_{}_{}.tif".format(region,lyr,veg_index)
         # Asegurarse de que la capa "tif" está visible
