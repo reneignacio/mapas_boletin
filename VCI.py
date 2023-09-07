@@ -60,7 +60,7 @@ for mxd_doc in orientacion:
     ruta_lagos_lyr = "formato/glaciares_y_lagos/Lagos.lyr"
     layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
 
-
+    """ 
     # Cargar capa de Lagos desde el archivo .lyr
     if "Lagos" not in layers_in_mxd:  
         if arcpy.Exists(ruta_lagos_lyr):  # Verifica si el archivo .lyr realmente existe
@@ -72,7 +72,7 @@ for mxd_doc in orientacion:
             except Exception as e:
                 print("Error cargando capa de lagos: {}".format(e))
     else:
-        print("La capa 'Lagos' ya está en el mxd.")
+        print("La capa 'Lagos' ya está en el mxd.") """
     #fin archivos leyenda
     legend.autoAdd = False
     # Cargar comunas shp
@@ -102,7 +102,7 @@ for mxd_doc in orientacion:
         
         else:
             print("{}.shp no está en el mxd".format(R))
-
+    """ 
     # Cargar capa Glaciares
     layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
 
@@ -132,8 +132,8 @@ for mxd_doc in orientacion:
                 print("No se encontró el archivo Glaciares_{}.shp".format(region))
         else:
             print("Glaciares_{}.shp ya está en el mxd".format(region))
-
-
+    """
+    """ 
     # Cargar lagos 
     for region in regiones.keys():
         R = region
@@ -160,7 +160,7 @@ for mxd_doc in orientacion:
                 except Exception as e:
                     print("Error cargando capa de lagos para la region {}: {}".format(R, e))
         else:
-            print("Lagos_{}.shp ya está en el mxd".format(R))
+            print("Lagos_{}.shp ya está en el mxd".format(R)) """
 
     arcpy.RefreshActiveView()
     arcpy.RefreshTOC()
