@@ -255,7 +255,7 @@ for mxd_doc in orientacion:
     def agregar_capa_leyenda(region):
         if region in ["R10","R11","R12"]:
             legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
-            legend.autoAdd = True
+            legend.autoAdd = False
             ruta_glaciares = "formato/glaciares_y_lagos/Glaciares2.lyr"
             glaciares_layer = arcpy.mapping.Layer(ruta_glaciares)
             
