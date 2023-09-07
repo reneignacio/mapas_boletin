@@ -99,6 +99,11 @@ for region in regiones.keys():
     else:
         print("{}.shp no está en el mxd".format(R))
 
+#actualizar ruta R13_sin
+layer_name = "R13_sin"
+new_path = "shape\\comunas\\"
+arcpy.mapping.ListLayers(mxd, layer_name, df)[0].replaceDataSource(new_path, "SHAPEFILE_WORKSPACE", "{}.shp".format(layer_name), False)
+
 # Cargar capa Glaciares
 layers_in_mxd = [layer.name for layer in arcpy.mapping.ListLayers(mxd)]
 
