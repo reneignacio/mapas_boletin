@@ -21,7 +21,7 @@ regiones = {
 }
 #os.chdir("D:/mapas_boletin/mapas_boletin")
 veg_index_=["NDVI","SAVI"]
-fecha="26 de junio al 11 de julio de 2023"
+fecha="13 al 28 de Agosto de 2023"
 mxd = arcpy.mapping.MapDocument("ANOMALIA.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 

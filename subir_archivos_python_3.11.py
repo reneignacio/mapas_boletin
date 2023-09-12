@@ -12,7 +12,7 @@ def obtener_ruta_destino(codigo, directorio, regiones):
         return f"{base_path}Análisis Del Índice De Vegetación Ajustado al Suelo (SAVI)/"
     if directorio == "componente_meteorologico": #"componente_meteorologico/plot"
         return f"{base_path}Componente Meteorológico/"
-    if directorio == "soil_moisture":
+    if directorio == "SOIL_MOISTURE":
         return f"{base_path}Disponibilidad de Agua/"
     if directorio == "VCI":
         return f"{base_path}Indice De Condición De La Vegetación (VCI) (En Evaluación)/"
@@ -30,15 +30,24 @@ def copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, directorio):
     
     ruta_destino = obtener_ruta_destino(codigo, directorio, regiones)
 
+    # En tu función copiar_imagenes
     for archivo in archivos:
         ruta_imagen_local = os.path.join(ruta_local_region, archivo)
+        ruta_imagen_destino = os.path.join(ruta_destino, archivo)
+        
+        print(f"Intentando transferir desde {ruta_imagen_local} a {ruta_imagen_destino}")
+        
         try:
-            sftp.put(ruta_imagen_local, os.path.join(ruta_destino, archivo))
+            sftp.put(ruta_imagen_local, ruta_imagen_destino)
             archivos_transferidos += 1
             print(f"Imagen {archivo} copiada a {ruta_destino}")
+        except FileNotFoundError:
+            errores_transferencia += 1
+            print(f"Archivo {archivo} no encontrado en {ruta_imagen_local}.")
         except Exception as e:
             errores_transferencia += 1
-            print(f"Error al copiar la imagen {archivo}: {e}")
+            print(f"Error desconocido al copiar la imagen {archivo}: {e}")
+
 
 def main():
     host = "186.64.122.224"
@@ -48,13 +57,15 @@ def main():
     
     regiones = {
         "R01" : "Tarapacá", "R02" : "Antofagasta","R03" : "Atacama",
-        "R04": "Coquimbo", "R05": "Valparaíso", "R06": "O`Higgins", "R07": "Maule",
+        "R04": "Coquimbo", "R05": "Valparaíso", "R06": "OHiggins", "R07": "Maule",
         "R08": "Bío Bío", "R09": "Araucanía", "R10": "Los Lagos",
         "R11": "Aysén", "R12": "Magallanes", "R13": "Metropolitana", "R14": "Los Rios",
         "R15": "Arica y Parinacota", "R16": "Ñuble"
     }
 
-    ruta_base_local = "C:/Users/Marcel/Desktop/mapas_boletin/mapas_boletin/data/Agosto"
+#RECUERDA CREAR CARPETA OHiggins todos los meses
+
+    ruta_base_local = "C:/Users/Marcel/Desktop/mapas_boletin/mapas_boletin/export"
     
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -62,16 +73,15 @@ def main():
     sftp = ssh.open_sftp()
     
     for codigo, region in regiones.items():
-        if codigo in ["R01", "R02", "R15"]:
-            copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SAVI')
-        if codigo not in ["R01", "R02", "R15"]:
-            copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'NDVI')
+       # if codigo in ["R01", "R02", "R15"]:
+        #    copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SAVI')
+        #if codigo not in ["R01", "R02", "R15"]:
+        #    copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'NDVI')
         if codigo in ["R05", "R06", "R07", "R08", "R09", "R13", "R16"]:  
-            copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'soil_moisture')
+            copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SOIL_MOISTURE')
 
-        copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'componente_meteorologico')
-        copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'VCI')
-
+        #copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'componente_meteorologico')
+        #copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'VCI')
     sftp.close()
     ssh.close()
 

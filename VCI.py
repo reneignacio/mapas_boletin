@@ -22,7 +22,7 @@ regiones = {
 
 #os.chdir("D:/mapas_boletin/mapas_boletin")
 #veg_index=["NDVI","SAVI"]
-fecha="26 de junio al 11 de julio de 2023"
+fecha="13 al 28 de Agosto de 2023"
 orientacion=["VCI_horizontal.mxd","VCI_vertical.mxd"]
 for mxd_doc in orientacion:
     mxd = arcpy.mapping.MapDocument(mxd_doc)

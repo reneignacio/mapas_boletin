@@ -21,7 +21,7 @@ regiones = {
 }
 #os.chdir("D:/mapas_boletin/mapas_boletin")
 veg_index_=["NDVI","SAVI"]
-fecha="26 de junio al 11 de julio de 2023"
+fecha="13 al 28 de Agosto de 2023"
 mxd = arcpy.mapping.MapDocument("NDVI_y_SAVI.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 df0 = arcpy.mapping.ListDataFrames(mxd)[0]
@@ -218,7 +218,7 @@ for veg_index in veg_index_:
     # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
     leyenda_layer = arcpy.mapping.ListLayers(mxd, "LEYENDA_v2.tif",df)[0]
     leyenda_layer.visible = False
-    ruta_estilo = "formato/NDVI/ndvi_prueba_eliminar.lyr"
+    ruta_estilo = "formato/NDVI/NDVI.lyr"
     sourceLayer = arcpy.mapping.Layer(ruta_estilo)
     arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
     #----------------------------------------------------------------------------------------
@@ -497,7 +497,7 @@ for veg_index in veg_index_:
 
 
     def aplicar_simbologia(region,lyr,df):
-        ruta_estilo = "formato/NDVI/ndvi_prueba_eliminar.lyr"
+        ruta_estilo = "formato/NDVI/NDVI.lyr"
         sourceLayer = arcpy.mapping.Layer(ruta_estilo)
         capa_destino = "{}_{}_{}.tif".format(region,lyr,veg_index)
         target_layers = arcpy.mapping.ListLayers(mxd, capa_destino,df)

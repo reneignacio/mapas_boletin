@@ -20,7 +20,7 @@ regiones = {
     "R16": "Región del Ñuble"
 }
 #os.chdir("D:/mapas_boletin/mapas_boletin")
-fecha="26 de junio al 11 de julio de 2023"
+fecha="13 al 28 de Agosto de 2023"
 mxd = arcpy.mapping.MapDocument("soil_moisture.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 
@@ -88,7 +88,7 @@ for region in regiones.keys():
                 print("Origen de datos de {}.shp actualizado".format(R))
                 
                 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
-                ruta_estilo = "formato/soil_moisture/soil_moisture.lyr"
+                ruta_estilo = "formato/soil_moisture/soil_moisture2.lyr"
                 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
                 arcpy.mapping.UpdateLayer(df, layer, sourceLayer, True)
                 print("Estilo comuna aplicado a {}".format(R))
@@ -217,7 +217,7 @@ arcpy.mapping.UpdateLayer(df, Regional_layer, sourceLayer, True)
 # Aplicar el estilo desde el archivo .lyr a la capa leyenda.tif
 leyenda_layer = arcpy.mapping.ListLayers(mxd, "LEYENDA_v2.tif")[0]
 leyenda_layer.visible = False
-ruta_estilo = "formato/soil_moisture/soil_moisture.lyr"
+ruta_estilo = "formato/soil_moisture/soil_moisture2.lyr"
 sourceLayer = arcpy.mapping.Layer(ruta_estilo)
 arcpy.mapping.UpdateLayer(df, leyenda_layer, sourceLayer, True)
 
@@ -335,7 +335,7 @@ def proceso(region):
         os.makedirs(carpeta)
     
     arcpy.RefreshActiveView()  # Refrescar la vista antes de guardar el PNG
-    salida_png = os.path.join(carpeta, "sm_{}.png".format(region))
+    salida_png = os.path.join(carpeta, "{}_sm.png".format(region))
     arcpy.mapping.ExportToPNG(mxd, salida_png, resolution=300, background_color="255, 255, 255")
     print("png {} guardado".format(region))
 
