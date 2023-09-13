@@ -26,7 +26,7 @@ def copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, directorio):
         print(f"Directorio {ruta_local_region} no encontrado. Saltando...")
         return
 
-    archivos = [f for f in os.listdir(ruta_local_region) if os.path.isfile(os.path.join(ruta_local_region, f))]
+    archivos = [f for f in os.listdir(ruta_local_region) if os.path.isfile(os.path.join(ruta_local_region, f)) and f.endswith('.png')]
     
     ruta_destino = obtener_ruta_destino(codigo, directorio, regiones)
 
@@ -73,15 +73,15 @@ def main():
     sftp = ssh.open_sftp()
     
     for codigo, region in regiones.items():
-       # if codigo in ["R01", "R02", "R15"]:
-        #    copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SAVI')
-        #if codigo not in ["R01", "R02", "R15"]:
-        #    copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'NDVI')
+        if codigo in ["R01", "R02", "R15"]:
+           copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SAVI')
+        if codigo not in ["R01", "R02", "R15"]:
+            copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'NDVI')
         if codigo in ["R05", "R06", "R07", "R08", "R09", "R13", "R16"]:  
             copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SOIL_MOISTURE')
 
         #copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'componente_meteorologico')
-        #copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'VCI')
+        copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'VCI')
     sftp.close()
     ssh.close()
 
