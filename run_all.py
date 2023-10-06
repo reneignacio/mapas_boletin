@@ -8,5 +8,5 @@ os.system('python NDVI_Y_SAVI.py &')
 os.system('python VCI.py &')
 #os.system('python soil_moisture.py &')
 
-#se demora aprox 10 min
+#se demora aprox 5 min
 #resultados se guardan en carpeta "export"

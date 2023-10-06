@@ -5,7 +5,7 @@ archivos_transferidos = 0
 errores_transferencia = 0
 
 def obtener_ruta_destino(codigo, directorio, regiones):
-    base_path = f"/var/www/LaravelInia/public/photos/shares/2023/Septiembre/{regiones[codigo]}/"
+    base_path = f"/var/www/LaravelInia/public/photos/shares/2023/Octubre/{regiones[codigo]}/"
     if directorio == "NDVI":
         return f"{base_path}Análisis Del Indice De Vegetación Normalizado (NDVI)/"
     if directorio == "SAVI":
@@ -80,7 +80,7 @@ def main():
         if codigo in ["R05", "R06", "R07", "R08", "R09", "R13", "R16"]:  
             copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SOIL_MOISTURE')
 
-        #copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'componente_meteorologico')
+        copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'componente_meteorologico')
         copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'VCI')
     sftp.close()
     ssh.close()
