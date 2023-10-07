@@ -349,13 +349,11 @@ for veg_index in veg_index_:
             if region != "R01" and region != "R02" and region != "R15":
                 proceso(region)
             else: print ("{} se calcula con SAVI".format(region))
-        mxd.save()
         print("Script finalizado, veg_index=NDVI")
 
     elif veg_index=="SAVI":
         proceso("R01")
         proceso("R02")
         proceso("R15")
-        mxd.save()
         print("Script finalizado, veg_index=SAVI")
 

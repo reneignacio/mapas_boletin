@@ -370,7 +370,7 @@ for mxd_doc in orientacion:
         proceso("R12")
         proceso("R15")
         print("VCI_VERTICAL finalizado")
-        mxd.save()
+       # mxd.save()
         y=1
     elif mxd_doc == "VCI_horizontal.mxd":
         proceso("R05")
@@ -383,7 +383,7 @@ for mxd_doc in orientacion:
         proceso("R05")
         proceso("R16")
         print("VCI_horizontal finalizado")
-        mxd.save()
+        #mxd.save()
         x=1
 if  x+y==2:
     print("vci horizontal y vertical finalizado")
