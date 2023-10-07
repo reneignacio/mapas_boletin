@@ -21,7 +21,7 @@ regiones = {
 }
 #os.chdir("D:/mapas_boletin/mapas_boletin")
 veg_index_=["NDVI","SAVI"]
-fecha="13 al 28 de Agosto de 2023"
+fecha="14 al 29 de Septiembre de 2023"
 mxd = arcpy.mapping.MapDocument("DIFERENCIA.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 

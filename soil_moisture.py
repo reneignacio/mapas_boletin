@@ -20,7 +20,7 @@ regiones = {
     "R16": "Región del Ñuble"
 }
 #os.chdir("D:/mapas_boletin/mapas_boletin")
-fecha="13 al 28 de Agosto de 2023"
+fecha="14 al 29 de Septiembre de 2023"
 mxd = arcpy.mapping.MapDocument("soil_moisture.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 
