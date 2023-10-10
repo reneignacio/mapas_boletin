@@ -3,14 +3,14 @@ import paramiko
 
 archivos_transferidos = 0
 errores_transferencia = 0
-
+#verificar si funciona bien el componente meteorologico
 def obtener_ruta_destino(codigo, directorio, regiones):
     base_path = f"/var/www/LaravelInia/public/photos/shares/2023/Octubre/{regiones[codigo]}/" #RECUERDA CAMBIAR EL MES
     if directorio == "NDVI":
         return f"{base_path}Análisis Del Indice De Vegetación Normalizado (NDVI)/"
     if directorio == "SAVI":
         return f"{base_path}Análisis Del Índice De Vegetación Ajustado al Suelo (SAVI)/"
-    if directorio == "componente_meteorologico": #"componente_meteorologico/plot"
+    if directorio == "componente_meteorologico/plot": #"componente_meteorologico/plot"
         return f"{base_path}Componente Meteorológico/"
     if directorio == "SOIL_MOISTURE":
         return f"{base_path}Disponibilidad de Agua/"
@@ -80,7 +80,7 @@ def main():
         if codigo in ["R05", "R06", "R07", "R08", "R09", "R13", "R16"]:  
             copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SOIL_MOISTURE')
 
-        #copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'componente_meteorologico')
+        copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'componente_meteorologico/plot')
         copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'VCI')
     sftp.close()
     ssh.close()
