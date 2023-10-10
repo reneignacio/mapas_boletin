@@ -77,8 +77,8 @@ def main():
            copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SAVI')
         if codigo not in ["R01", "R02", "R15"]:
             copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'NDVI')
-        #if codigo in ["R05", "R06", "R07", "R08", "R09", "R13", "R16"]:  
-            #copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SOIL_MOISTURE')
+        if codigo in ["R05", "R06", "R07", "R08", "R09", "R13", "R16"]:  
+            copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SOIL_MOISTURE')
 
         #copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'componente_meteorologico')
         copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'VCI')
