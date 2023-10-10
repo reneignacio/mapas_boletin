@@ -2,6 +2,8 @@
 import arcpy
 import os
 
+##copiar script y ejecutarlo en VCI_SHP_TO_KMZ.mxd
+
 # Obtener el MXD y el dataframe actual
 #mxd = arcpy.mapping.MapDocument("VCI_SHP_TO_KMZ.mxd")
 mxd = arcpy.mapping.MapDocument("CURRENT")
@@ -14,6 +16,14 @@ def remove_all_layers(mxd, data_frame):
 
 # Habilitar la sobrescritura de archivos existentes
 arcpy.env.overwriteOutput = True
+
+#crear carpeta si no existe
+def crear_carpeta(ruta):
+    if not os.path.exists(ruta):
+        os.makedirs(ruta)
+        print("Carpeta creada: {}".format(ruta))
+    else:
+        print("Carpeta ya existe: {}".format(ruta))
 
 # Función para eliminar campos innecesarios
 def delete_unnecessary_fields(shp_path, fields_to_keep):
@@ -50,6 +60,9 @@ data_folder_path = r"C:\Users\Marcel\Desktop\mapas_boletin\mapas_boletin\data"
 output_folder = r"C:\Users\Marcel\Desktop\mapas_boletin\mapas_boletin\export\output"
 layer_file_path = r"C:\Users\Marcel\Desktop\mapas_boletin\mapas_boletin\formato\VCI\VCI_shp_para_kmz.lyr"
 kmz_output_folder = r"C:\Users\Marcel\Desktop\mapas_boletin\mapas_boletin\export\vci_kmz"
+
+crear_carpeta(output_folder)
+crear_carpeta(kmz_output_folder)
 
 # Campos a conservar
 fields_to_keep = ['nom_com', 'VCI']
@@ -106,7 +119,7 @@ for i in range(1, 17):
         arcpy.JoinField_management(simplified_layer, "nom_com", original_layer, "nom_com", ["A2023"])
         arcpy.CalculateField_management(simplified_layer, "VCI", "!A2023!", "PYTHON_9.3")
         arcpy.DeleteField_management(simplified_layer, "A2023")
-
+        arcpy.DeleteField_management(simplified_layer, "A2023_1")
         # Crear nuevo shapefile
         arcpy.CopyFeatures_management(simplified_layer, output_shp_path)
 
