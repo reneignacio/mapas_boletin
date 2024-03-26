@@ -1,16 +1,16 @@
 import os
 import paramiko
-
+#RECUERDA CAMBIAR EL MES
 archivos_transferidos = 0
 errores_transferencia = 0
 #verificar si funciona bien el componente meteorologico
 def obtener_ruta_destino(codigo, directorio, regiones):
-    base_path = f"/var/www/LaravelInia/public/photos/shares/2023/Octubre/{regiones[codigo]}/" #RECUERDA CAMBIAR EL MES
+    base_path = f"/var/www/LaravelInia/public/photos/shares/2024/Marzo/{regiones[codigo]}/" #RECUERDA CAMBIAR A MES ACTUAL
     if directorio == "NDVI":
         return f"{base_path}Análisis Del Indice De Vegetación Normalizado (NDVI)/"
     if directorio == "SAVI":
         return f"{base_path}Análisis Del Índice De Vegetación Ajustado al Suelo (SAVI)/"
-    if directorio == "componente_meteorologico/plot": #"componente_meteorologico/plot"
+    if directorio == "componente_meteorologico/plot": #"componente_meteorologico"
         return f"{base_path}Componente Meteorológico/"
     if directorio == "SOIL_MOISTURE":
         return f"{base_path}Disponibilidad de Agua/"
@@ -35,12 +35,12 @@ def copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, directorio):
         ruta_imagen_local = os.path.join(ruta_local_region, archivo)
         ruta_imagen_destino = os.path.join(ruta_destino, archivo)
         
-        print(f"Intentando transferir desde {ruta_imagen_local} a {ruta_imagen_destino}")
+        print(f" {ruta_imagen_local} a {ruta_imagen_destino}")
         
         try:
             sftp.put(ruta_imagen_local, ruta_imagen_destino)
             archivos_transferidos += 1
-            print(f"Imagen {archivo} copiada a {ruta_destino}")
+            print(f" {archivo} copiado a {ruta_destino}")
         except FileNotFoundError:
             errores_transferencia += 1
             print(f"Archivo {archivo} no encontrado en {ruta_imagen_local}.")
@@ -73,15 +73,15 @@ def main():
     sftp = ssh.open_sftp()
     
     for codigo, region in regiones.items():
-        if codigo in ["R01", "R02", "R15"]:
-           copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SAVI')
-        if codigo not in ["R01", "R02", "R15"]:
-            copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'NDVI')
-        if codigo in ["R05", "R06", "R07", "R08", "R09", "R13", "R16"]:  
-            copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SOIL_MOISTURE')
+        #if codigo in ["R01", "R02", "R15"]:
+         # copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SAVI')
+        #if codigo not in ["R01", "R02", "R15"]:
+         #   copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'NDVI')
+        #if codigo in ["R05", "R06", "R07", "R08", "R09", "R13", "R16"]:  
+         #   copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'SOIL_MOISTURE')
 
         copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'componente_meteorologico/plot')
-        copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'VCI')
+        #copiar_imagenes(ssh, sftp, codigo, ruta_base_local, regiones, 'VCI')
     sftp.close()
     ssh.close()
 
@@ -91,3 +91,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

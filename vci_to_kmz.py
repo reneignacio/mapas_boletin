@@ -116,10 +116,10 @@ for i in range(1, 17):
     
     if original_layer and simplified_layer:
         # Unión y copia de campos
-        arcpy.JoinField_management(simplified_layer, "nom_com", original_layer, "nom_com", ["A2023"])
-        arcpy.CalculateField_management(simplified_layer, "VCI", "!A2023!", "PYTHON_9.3")
-        arcpy.DeleteField_management(simplified_layer, "A2023")
-        arcpy.DeleteField_management(simplified_layer, "A2023_1")
+        arcpy.JoinField_management(simplified_layer, "nom_com", original_layer, "nom_com", ["A2024"])
+        arcpy.CalculateField_management(simplified_layer, "VCI", "!A2024!", "PYTHON_9.3")
+        arcpy.DeleteField_management(simplified_layer, "A2024")
+        arcpy.DeleteField_management(simplified_layer, "A2024_1")
         # Crear nuevo shapefile
         arcpy.CopyFeatures_management(simplified_layer, output_shp_path)
 

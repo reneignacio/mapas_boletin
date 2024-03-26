@@ -1,8 +1,8 @@
 import paramiko
 
 def replicar_estructura_directorios(sftp, origen, destino, mes):
-    origen_completo = f"/var/www/LaravelInia/public/photos/shares/2023/{mes}/{origen}"
-    destino_completo = f"/var/www/LaravelInia/public/photos/shares/2023/{mes}/{destino}"
+    origen_completo = f"/var/www/LaravelInia/public/photos/shares/2024/{mes}/{origen}"
+    destino_completo = f"/var/www/LaravelInia/public/photos/shares/2024/{mes}/{destino}"
 
     # Crear la carpeta de destino si no existe
     try:
@@ -33,9 +33,9 @@ def main():
     host = "186.64.122.224"
     port = 22222
     user = "root"
-    passwd = "pzQ35tLoPNBSl5990m"  # Cambia esto por tu contraseña real
+    passwd = "pzQ35tLoPNBSl5990m" 
 
-    mes = "Octubre"  # Puedes cambiar esto según necesites
+    mes = "Marzo"  #  cambiar esto mes actuan el en que estamos
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -49,3 +49,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

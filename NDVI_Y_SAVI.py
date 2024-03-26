@@ -21,7 +21,7 @@ regiones = {
 }
 #os.chdir("D:/mapas_boletin/mapas_boletin")
 veg_index_=["NDVI","SAVI"]
-fecha="14 al 29 de Septiembre de 2023"
+fecha= "18 de febrero al 04 de marzo de 2024"
 mxd = arcpy.mapping.MapDocument("NDVI_y_SAVI.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 df0 = arcpy.mapping.ListDataFrames(mxd)[0]

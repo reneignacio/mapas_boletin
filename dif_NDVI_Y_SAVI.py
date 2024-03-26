@@ -21,7 +21,7 @@ regiones = {
 }
 #os.chdir("D:/mapas_boletin/mapas_boletin")
 veg_index_=["NDVI","SAVI"]
-fecha="14 al 29 de Septiembre de 2023"
+fecha="18 de febrero al 04 de marzo de 2024"
 mxd = arcpy.mapping.MapDocument("DIFERENCIA.mxd")
 df = arcpy.mapping.ListDataFrames(mxd)[0]
 
@@ -305,7 +305,7 @@ for veg_index in veg_index_:
 
         agregar_capa_leyenda(region)
         # Actualiza el título
-        titulo_nuevo = "Diferencia de {} del {}, {}".format(veg_index,regiones[region],fecha)
+        titulo_nuevo = "Diferencia de {} de la {}, {}".format(veg_index,regiones[region],fecha)
         for elem in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
             if "Diferencia" in elem.text:
                 elem.text = titulo_nuevo

@@ -22,7 +22,7 @@ regiones = {
 
 #os.chdir("D:/mapas_boletin/mapas_boletin")
 #veg_index=["NDVI","SAVI"]
-fecha="14 al 29 de Septiembre de 2023"
+fecha= "18 de febrero al 04 de marzo de 2024"
 orientacion=["VCI_horizontal.mxd","VCI_vertical.mxd"]
 for mxd_doc in orientacion:
     mxd = arcpy.mapping.MapDocument(mxd_doc)
@@ -311,7 +311,7 @@ for mxd_doc in orientacion:
         if region in ["R11", "R12"]:
             titulo_nuevo = "VCI de la {} \n{}".format(regiones[region],fecha)
         else:
-            titulo_nuevo = "Indice de la condicion de la vegetacion (VCI) de la {} \n{}".format(regiones[region],fecha)    
+            titulo_nuevo = "Índice de la Condición de la Vegetación (VCI) de la {} \n{}".format(regiones[region],fecha)    
         
         for elem in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
             if "VCI" in elem.text:
